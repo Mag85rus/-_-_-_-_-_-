@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Обучение курьеров — новый алгоритм</title>
+    <title>Обучение курьеров</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Все стили без изменений — они уже корректны */
+        /* ---- Базовые стили (без изменений) ---- */
         * {
             margin: 0;
             padding: 0;
@@ -74,6 +74,97 @@
             pointer-events: none;
         }
 
+        /* ---- Блок выбора языка ---- */
+        .language-selector {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+            text-align: center;
+            position: relative;
+            z-index: 5;
+        }
+        .language-selector h2 {
+            font-size: 28px;
+            font-weight: 900;
+            color: #2d1f17;
+            margin-bottom: 8px;
+        }
+        .language-selector p {
+            font-size: 16px;
+            color: #5a4a3a;
+            margin-bottom: 30px;
+        }
+        .lang-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .lang-btn {
+            background: rgba(255,255,255,0.6);
+            border: 2px solid rgba(205,92,92,0.2);
+            border-radius: 20px;
+            padding: 14px 28px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #2d1f17;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.8);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .lang-btn.selected {
+            border-color: var(--primary);
+            background: rgba(255,36,76,0.08);
+            box-shadow: 0 0 0 3px rgba(255,36,76,0.2);
+        }
+        .lang-btn img {
+            width: 28px;
+            height: auto;
+        }
+        .btn-continue {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 14px 48px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 14px rgba(255,36,76,0.25);
+        }
+        .btn-continue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255,36,76,0.3);
+        }
+        .btn-continue:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            transform: none;
+        }
+
+        /* ---- Основное приложение (обучение) ---- */
+        .app-content {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+        .app-content.visible {
+            display: flex;
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -84,7 +175,6 @@
             position: relative;
             z-index: 2;
         }
-
         .brand {
             display: flex;
             align-items: center;
@@ -108,6 +198,38 @@
             color: #3a2a22;
         }
         .brand-text span { color: var(--primary); }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .lang-switcher {
+            display: flex;
+            gap: 4px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 30px;
+            padding: 4px;
+            border: 1px solid rgba(205,92,92,0.15);
+        }
+        .lang-switcher button {
+            background: transparent;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #5a4a3a;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .lang-switcher button.active {
+            background: var(--primary);
+            color: #fff;
+        }
+        .lang-switcher button:hover:not(.active) {
+            background: rgba(255,36,76,0.1);
+        }
 
         .score-area {
             display: flex;
@@ -520,6 +642,13 @@
                 flex: none;
                 width: 100%;
             }
+            .lang-grid {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .lang-btn {
+                min-width: unset;
+            }
         }
 
         @media print {
@@ -549,310 +678,1041 @@
 </head>
 <body>
 <div class="app" id="app">
-    <!-- Шапка -->
-    <div class="header">
-        <div class="brand">
-            <div class="brand-icon"><i class="fas fa-route"></i></div>
-            <div class="brand-text">Доставка <span>•</span> Обучение <span>•</span> Качество <span>•</span> Скорость <span>•</span> Забота</div>
+
+    <!-- ===== Блок выбора языка ===== -->
+    <div class="language-selector" id="languageSelector">
+        <h2>🌐 Выберите язык / Тилди тандаңыз / Забон интихоб кунед / Tilni tanlang</h2>
+        <p>Выберите язык, на котором будет проходить обучение</p>
+        <div class="lang-grid" id="langGrid">
+            <button class="lang-btn" data-lang="ru">🇷🇺 Русский</button>
+            <button class="lang-btn" data-lang="ky">🇰🇬 Кыргызча</button>
+            <button class="lang-btn" data-lang="tg">🇹🇯 Тоҷикӣ</button>
+            <button class="lang-btn" data-lang="uz">🇺🇿 Oʻzbekcha</button>
         </div>
-        <div class="score-area">
-            <span class="progress-indicator" id="stepIndicator">1 / 6</span>
-            <span class="score" id="scoreDisplay"><i class="fas fa-star"></i> <span id="scoreValue">0</span></span>
-        </div>
+        <button class="btn-continue" id="btnContinue" disabled>Продолжить / Улантуу / Идома / Davom etish</button>
     </div>
 
-    <!-- Прогресс-бар -->
-    <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-    </div>
-
-    <!-- Контейнер шагов -->
-    <div class="step-container" id="stepContainer">
-        <!-- Шаг 0: Приветствие -->
-        <div class="step active" data-step="0">
-            <h2>🚀 Новый флоу «На месте»</h2>
-            <div class="subtitle">Курьерский алгоритм передачи заказа</div>
-            <div class="card-content">
-                <p><strong>Привет, курьер!</strong> Мы обновили процесс доставки, чтобы сделать его надёжнее и удобнее.</p>
-                <p>В этом обучении ты:</p>
-                <ul>
-                    <li><i class="fas fa-check-circle"></i> Узнаешь, зачем мы внедрили механику свайпов</li>
-                    <li><i class="fas fa-check-circle"></i> Изучишь пошаговый алгоритм</li>
-                    <li><i class="fas fa-check-circle"></i> Освоишь протокол «3 × 20» для недозвонов</li>
-                    <li><i class="fas fa-check-circle"></i> Пройдёшь тест и чек-лист</li>
-                </ul>
-                <div class="highlight">
-                    <i class="fas fa-gem" style="color: var(--primary);"></i> За каждый шаг ты получаешь <strong>очки</strong>. Максимум — <strong>100 баллов</strong> и именной сертификат!
+    <!-- ===== Основной контент (обучение) ===== -->
+    <div class="app-content" id="appContent">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-route"></i></div>
+                <div class="brand-text">Доставка <span>•</span> Обучение <span>•</span> Качество <span>•</span> Скорость <span>•</span> Забота</div>
+            </div>
+            <div class="header-right">
+                <div class="lang-switcher" id="langSwitcher">
+                    <button data-lang="ru">RU</button>
+                    <button data-lang="ky">KG</button>
+                    <button data-lang="tg">TJ</button>
+                    <button data-lang="uz">UZ</button>
                 </div>
-                <div style="margin-top: 12px;">
-                    <label style="font-weight: 600; font-size: 15px; color: #2d1f17;">Ваше имя (для сертификата):</label>
-                    <input type="text" id="userNameInput" placeholder="Введите имя и фамилию" style="width: 100%; padding: 10px 16px; border-radius: 14px; border: 2px solid rgba(205,92,92,0.2); font-size: 15px; margin-top: 4px; background: rgba(255,255,255,0.6);">
+                <div class="score-area">
+                    <span class="progress-indicator" id="stepIndicator">1 / 6</span>
+                    <span class="score" id="scoreDisplay"><i class="fas fa-star"></i> <span id="scoreValue">0</span></span>
                 </div>
             </div>
-            <div class="nav-buttons">
-                <span></span>
-                <button class="btn btn-primary" onclick="nextStep()">Начать обучение <i class="fas fa-arrow-right"></i></button>
-            </div>
         </div>
 
-        <!-- Шаг 1: Модуль 1 -->
-        <div class="step" data-step="1">
-            <h2>1. Зачем мы меняем алгоритм?</h2>
-            <div class="subtitle">Почему свайп лучше нажатия</div>
-            <div class="card-content">
-                <p><strong>Проблема:</strong> Раньше курьеры могли случайно нажать кнопку в кармане или при переноске телефона – заказ завершался раньше времени, гость не получал уведомление о прибытии, возникали споры и лишние звонки в поддержку.</p>
-                <p><strong>Решение:</strong> Мы вводим <strong>механику свайпа</strong> – движение пальцем слева направо. Это исключает ложные срабатывания и делает статусы точными.</p>
-                <ul>
-                    <li><i class="fas fa-arrow-right"></i> Свайп используется только там, где важно избежать случайности (прибытие и приём оплаты).</li>
-                    <li><i class="fas fa-arrow-right"></i> Остальные действия – обычный клик.</li>
-                </ul>
-                <div class="highlight">
-                    <i class="fas fa-check-circle" style="color: var(--primary);"></i> <strong>Что меняется для вас:</strong> больше никаких «я не нажимал, само завершилось». Чёткая последовательность: приехал → свайп → поднялся → передал → завершил.
-                </div>
-            </div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
-                <button class="btn btn-primary" onclick="nextStep()">Далее <i class="fas fa-arrow-right"></i></button>
-            </div>
+        <!-- Прогресс-бар -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
         </div>
 
-        <!-- Шаг 2: Модуль 2 (4 шага) -->
-        <div class="step" data-step="2">
-            <h2>2. Алгоритм</h2>
-            <div class="subtitle">Главное</div>
-            <div class="card-content">
-                <p><strong>Шаг 1. Прибытие</strong><br>
-                Как только остановились у адреса доставки, не покидая ТС (до выхода из машины) – <strong>свайп</strong> по кнопке «На месте». После появится зелёный баннер «Прибытие подтверждено». Только после этого продолжайте.</p>
-                <p><strong>Шаг 2. Передача заказа</strong><br>
-                • <strong>Оплата наличными/картой курьеру:</strong> свайп по кнопке «Принять оплату».<br>
-                • <strong>Оплата онлайн:</strong> клик по кнопке «Завершить заказ».</p>
-                <p><strong>Гость не открывает</strong><br>
-                Позвоните <strong>3 раза</strong> по <strong>20 секунд</strong>. Если не ответил – нажмите красную кнопку «Не дозвонился».</p>
-                <p><strong>После «Не дозвонился»</strong><br>
-                Не ждите у двери, уходите на другие заказы. Вернуться можно только через «Вернуться к заказам» после подтверждения от поддержки.</p>
-                <div class="badge-step"><i class="far fa-clock"></i> Запомните последовательность</div>
-            </div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
-                <button class="btn btn-primary" onclick="nextStep()">Далее <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-
-        <!-- Шаг 3: Модуль 3 (протокол) -->
-        <div class="step" data-step="3">
-            <h2>3. Протокол «3 × 20»</h2>
-            <div class="subtitle">Детали</div>
-            <div class="card-content">
-                <p><strong>Почему 3 звонка и 20 секунд?</strong><br>
-                3 попытки – достаточный минимум, чтобы гость успел услышать и подойти. 20 секунд – стандартное время ожидания, которое не затягивает, но даёт шанс ответить.</p>
-                <ul>
-                    <li><i class="fas fa-phone"></i> Совершая звонок, считайте про себя до 20.</li>
-                    <li><i class="fas fa-phone"></i> Если сбросили до 20 секунд – звонок не засчитывается, нужно повторить.</li>
-                    <li><i class="fas fa-phone"></i> После трёх полных попыток – только тогда кнопка «Не дозвонился».</li>
-                </ul>
-                <div class="highlight">
-                    <i class="fas fa-undo-alt" style="color: var(--copper);"></i> <strong>Важно:</strong> Если гость перезвонил позже – вы можете вернуться, но только по кнопке «Вернуться к заказам» (она активируется после подтверждения от поддержки).
-                </div>
-            </div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
-                <button class="btn btn-primary" onclick="nextStep()">Далее <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-
-        <!-- Шаг 4: Модуль 4 (частые ошибки) -->
-        <div class="step" data-step="4">
-            <h2>4. Частые ошибки</h2>
-            <div class="subtitle">Как их избежать</div>
-            <div class="card-content">
-                <ul>
-                    <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> Нажал «На месте» уже в подъезде или у двери.<br>
-                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Нажимайте сразу не покидая ТС – это важно для точного расчёта времени.</li>
-                    <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> Вместо свайпа просто кликнул – статус не установился.<br>
-                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Всегда тяните стрелку до конца, пока не увидите зелёный баннер.</li>
-                    <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> Позвонил 1 раз – сразу «Не дозвонился».<br>
-                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Строго 3 звонка по 20 секунд.</li>
-                    <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> После «Не дозвонился» остался ждать у двери.<br>
-                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Уходите сразу, вернётесь позже.</li>
-                </ul>
-            </div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
-                <button class="btn btn-primary" onclick="nextStep()">Далее <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-
-        <!-- Шаг 5: Тест -->
-        <div class="step" data-step="5">
-            <h2>5. Контрольные вопросы</h2>
-            <div class="subtitle">Проверьте себя</div>
-            <div class="card-content" id="testContainer">
-                <!-- генерируется JS -->
-            </div>
-            <div id="testResultContainer" style="display: none;"></div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
-                <button class="btn btn-success" id="submitTestBtn" onclick="submitTest()">Завершить тест</button>
-                <button class="btn btn-primary hidden" id="goToChecklistBtn" onclick="goToStep(6)">Перейти к чек-листу <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-
-        <!-- Шаг 6: Чек-лист -->
-        <div class="step" data-step="6">
-            <h2>6. Чек-лист курьера</h2>
-            <div class="subtitle">Подготовка к смене</div>
-            <div class="card-content" id="checklistContainer">
-                <!-- генерируется JS -->
-            </div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
-                <button class="btn btn-success" id="finishBtn" onclick="finishCourse()">Завершить обучение <i class="fas fa-graduation-cap"></i></button>
-            </div>
-        </div>
-
-        <!-- Шаг 7: Финальный экран -->
-        <div class="step" data-step="7">
-            <div class="final">
-                <div class="big-icon"><i class="fas fa-trophy"></i></div>
-                <h2>Поздравляем!</h2>
-                <p style="font-size: 18px; color: #3f332a;">Вы успешно прошли обучение по новому флоу «На месте».</p>
-                <div class="stars">⭐⭐⭐⭐⭐</div>
-                <p style="font-size: 20px; font-weight: 600;">Ваши очки: <span class="score-final" id="finalScore">0</span></p>
-
-                <!-- Сертификат -->
-                <div class="certificate" id="certificateArea">
-                    <h3>📜 Сертификат об обучении</h3>
-                    <p>Настоящим подтверждается, что</p>
-                    <div class="name" id="certName">Имя</div>
-                    <p>успешно освоил новый алгоритм передачи заказа</p>
-                    <p style="font-size: 14px; color: #5a4a3a;">и подтвердил свои знания тестированием</p>
-                    <div class="meta">Дата: <span id="certDate"></span> • Доставка Экспресс</div>
-                </div>
-
-                <div style="margin-top: 20px;">
-                    <button class="btn btn-secondary" onclick="location.reload()"><i class="fas fa-redo"></i> Пройти заново</button>
-                </div>
-                <canvas id="certCanvas" width="800" height="500"></canvas>
-            </div>
+        <!-- Контейнер шагов -->
+        <div class="step-container" id="stepContainer">
+            <!-- Все шаги будут генерироваться через JS -->
         </div>
     </div>
 </div>
 
 <script>
-    // Данные теста с пояснениями (без изменений)
-    const testData = [
-        {
-            question: '1. Когда нужно сделать свайп «На месте»?',
-            options: [
-                'После того как поднялся на этаж',
-                'Сразу по прибытии на адрес доставки, не покидая ТС(до выхода из машины)',
-                'После того как позвонил в домофон'
-            ],
-            correct: 1,
-            explanation: 'Свайп «На месте» нужно делать сразу не покидая ТС (до выхода из машины), ещё до входа в здание. Это даёт точный расчёт времени доставки и прозрачность для гостя.'
+    // ============================
+    // ПЕРЕВОДЫ
+    // ============================
+    const TRANSLATIONS = {
+        ru: {
+            langName: 'Русский',
+            welcome: {
+                title: '🚀 Новый алгоритм «На месте»',
+                subtitle: 'Курьерский алгоритм передачи заказа',
+                greeting: 'Привет, курьер! Мы обновили процесс доставки, чтобы сделать его надёжнее и удобнее.',
+                list: [
+                    'Узнаешь, зачем мы внедрили механику свайпов',
+                    'Изучишь пошаговый алгоритм',
+                    'Освоишь протокол «3 × 20» для недозвонов',
+                    'Пройдёшь тест и чек-лист'
+                ],
+                highlight: 'За каждый шаг ты получаешь очки. Максимум — 100 баллов и именной сертификат!',
+                nameLabel: 'Ваше имя (для сертификата):',
+                namePlaceholder: 'Введите имя и фамилию',
+                button: 'Начать обучение'
+            },
+            module1: {
+                title: '1. Зачем мы меняем алгоритм?',
+                subtitle: 'Почему свайп лучше нажатия',
+                problem: 'Раньше курьеры могли случайно нажать кнопку в кармане или при переноске телефона – заказ завершался раньше времени, гость не получал уведомление о прибытии, возникали споры и лишние звонки в поддержку.',
+                solution: 'Мы вводим механику свайпа – движение пальцем слева направо. Это исключает ложные срабатывания и делает статусы точными.',
+                list: [
+                    'Свайп используется только там, где важно избежать случайности (прибытие и приём оплаты).',
+                    'Остальные действия – обычный клик.'
+                ],
+                highlight: 'Что меняется для вас: больше никаких «я не нажимал, само завершилось». Чёткая последовательность: приехал → свайп → поднялся → передал → завершил.'
+            },
+            module2: {
+                title: '2. Алгоритм',
+                subtitle: 'Главное',
+                step1: 'Как только остановились у адреса доставки, не покидая ТС (до выхода из машины) – свайп по кнопке «На месте». После появится зелёный баннер «Прибытие подтверждено». Только после этого продолжайте.',
+                step2_1: 'Оплата наличными/картой курьеру: свайп по кнопке «Принять оплату».',
+                step2_2: 'Оплата онлайн: клик по кнопке «Завершить заказ».',
+                step3: 'Гость не открывает: позвоните 3 раза по 20 секунд. Если не ответил – нажмите красную кнопку «Не дозвонился».',
+                step4: 'После «Не дозвонился»: не ждите у двери, уходите на другие заказы. Вернуться можно только через «Вернуться к заказам» после подтверждения от поддержки.',
+                badge: 'Запомните последовательность'
+            },
+            module3: {
+                title: '3. Протокол «3 × 20»',
+                subtitle: 'Детали',
+                why: '3 попытки – достаточный минимум, чтобы гость успел услышать и подойти. 20 секунд – стандартное время ожидания, которое не затягивает, но даёт шанс ответить.',
+                list: [
+                    'Совершая звонок, считайте про себя до 20.',
+                    'Если сбросили до 20 секунд – звонок не засчитывается, нужно повторить.',
+                    'После трёх полных попыток – только тогда кнопка «Не дозвонился».'
+                ],
+                highlight: 'Важно: Если гость перезвонил позже – вы можете вернуться, но только по кнопке «Вернуться к заказам» (она активируется после подтверждения от поддержки).'
+            },
+            module4: {
+                title: '4. Частые ошибки',
+                subtitle: 'Как их избежать',
+                errors: [
+                    { error: 'Нажал «На месте» уже в подъезде или у двери.', correct: 'Нажимайте сразу не покидая ТС – это важно для точного расчёта времени.' },
+                    { error: 'Вместо свайпа просто кликнул – статус не установился.', correct: 'Всегда тяните стрелку до конца, пока не увидите зелёный баннер.' },
+                    { error: 'Позвонил 1 раз – сразу «Не дозвонился».', correct: 'Строго 3 звонка по 20 секунд.' },
+                    { error: 'После «Не дозвонился» остался ждать у двери.', correct: 'Уходите сразу, вернётесь позже.' }
+                ]
+            },
+            test: {
+                title: '5. Контрольные вопросы',
+                subtitle: 'Проверьте себя',
+                questions: [
+                    {
+                        question: '1. Когда нужно сделать свайп «На месте»?',
+                        options: [
+                            'После того как поднялся на этаж',
+                            'Сразу по прибытии на адрес доставки, не покидая ТС (до выхода из машины)',
+                            'После того как позвонил в домофон'
+                        ],
+                        correct: 1,
+                        explanation: 'Свайп «На месте» нужно делать сразу не покидая ТС (до выхода из машины), ещё до входа в здание. Это даёт точный расчёт времени доставки и прозрачность для гостя.'
+                    },
+                    {
+                        question: '2. Сколько раз нужно позвонить гостю, если он не открывает дверь?',
+                        options: ['1 раз', '2 раза', '3 раза'],
+                        correct: 2,
+                        explanation: 'Протокол требует ровно 3 звонка. Меньше — нарушение регламента, больше — задержка времени.'
+                    },
+                    {
+                        question: '3. Как долго ждать ответа при каждом звонке?',
+                        options: ['10 секунд', '20 секунд', '30 секунд'],
+                        correct: 1,
+                        explanation: 'Каждый звонок должен длиться не менее 20 секунд. Это стандарт, который даёт гостю время подойти к телефону.'
+                    },
+                    {
+                        question: '4. Что появляется после успешного свайпа «На месте»?',
+                        options: [
+                            'Красный баннер «Ожидание»',
+                            'Зелёный баннер «Прибытие подтверждено»',
+                            'Синий баннер «Заказ принят»'
+                        ],
+                        correct: 1,
+                        explanation: 'После успешного свайпа появляется зелёный баннер «Прибытие подтверждено» — это сигнал, что можно идти дальше к гостю.'
+                    },
+                    {
+                        question: '5. Если заказ оплачен онлайн, какой кнопкой завершать?',
+                        options: [
+                            '«Принять оплату» (свайп)',
+                            '«Завершить заказ» (клик)',
+                            '«Не дозвонился»'
+                        ],
+                        correct: 1,
+                        explanation: 'При онлайн-оплате используется кнопка «Завершить заказ» — обычный клик, без свайпа, потому что оплата уже проведена.'
+                    },
+                    {
+                        question: '6. После нажатия «Не дозвонился» что нужно сделать?',
+                        options: [
+                            'Ждать у двери 10 минут',
+                            'Уйти и доставлять другие заказы',
+                            'Позвонить ещё раз через 5 минут'
+                        ],
+                        correct: 1,
+                        explanation: 'После «Не дозвонился» статус финальный, курьер обязан покинуть адрес и доставить следующий заказ. Ожидание запрещено.'
+                    }
+                ]
+            },
+            checklist: {
+                title: '6. Чек-лист курьера',
+                subtitle: 'Подготовка к смене',
+                items: [
+                    'Я знаю, что свайп – это движение слева направо, а не нажатие.',
+                    'Я буду нажимать «На месте», не покидая ТС (до выхода из машины).',
+                    'Я буду ждать зелёный баннер «Прибытие подтверждено».',
+                    'Я различаю: свайп для оплаты курьеру и клик для онлайн-оплаты.',
+                    'Я помню правило 3 звонков по 20 секунд.',
+                    'Я знаю, что после «Не дозвонился» нужно уходить.',
+                    'Я знаю, что вернуться можно только через «Вернуться к заказам».'
+                ]
+            },
+            final: {
+                title: 'Поздравляем!',
+                subtitle: 'Вы успешно прошли обучение по новому алгоритму.',
+                scoreText: 'Ваши очки:',
+                certificate: {
+                    title: '📜 Сертификат об обучении',
+                    text1: 'Настоящим подтверждается, что',
+                    name: 'Имя',
+                    text2: 'успешно освоил новый алгоритм передачи заказа',
+                    text3: 'и подтвердил свои знания тестированием',
+                    meta: 'Дата: {date} • Доставка Экспресс'
+                }
+            },
+            buttons: {
+                start: 'Начать обучение',
+                next: 'Далее',
+                back: 'Назад',
+                submitTest: 'Завершить тест',
+                goToChecklist: 'Перейти к чек-листу',
+                finish: 'Завершить обучение',
+                restart: 'Пройти заново'
+            }
         },
-        {
-            question: '2. Сколько раз нужно позвонить гостю, если он не открывает дверь?',
-            options: ['1 раз', '2 раза', '3 раза'],
-            correct: 2,
-            explanation: 'Протокол требует ровно 3 звонка. Меньше — нарушение регламента, больше — задержка времени.'
+        ky: {
+            langName: 'Кыргызча',
+            welcome: {
+                title: '🚀 Жаңы «На месте» алгоритми',
+                subtitle: 'Заказды өткөрүү боюнча курьердик алгоритм',
+                greeting: 'Салам, курьер! Биз жеткирүү процессин ишенимдүү жана ыңгайлуу кылуу үчүн жаңырттык.',
+                list: [
+                    'Эмне үчүн свайп механизмин киргизгенибизди билесиз',
+                    'Кадамдык алгоритмди үйрөнөсүз',
+                    '«3 × 20» протоколун өздөштүрөсүз',
+                    'Тест жана чек-листтен өтөсүз'
+                ],
+                highlight: 'Ар бир кадам үчүн упай аласыз. Максимум — 100 балл жана атыңыз жазылган сертификат!',
+                nameLabel: 'Атыңыз (сертификат үчүн):',
+                namePlaceholder: 'Аты-жөнүңүздү жазыңыз',
+                button: 'Окууну баштоо'
+            },
+            module1: {
+                title: '1. Эмне үчүн алгоритмди өзгөртөбүз?',
+                subtitle: 'Эмне үчүн свайп басуудан жакшы',
+                problem: 'Мурда курьерлер чөнтөгүндө же телефонду көтөрүп жүргөндө кокустан баскан – заказ эрте бүтүп калган, конок келгени жөнүндө эскертме алган эмес, талаш-тартыштар жана колдоо кызматына кошумча чалуулар болгон.',
+                solution: 'Биз свайп механизмин киргизип жатабыз – бармакты солдон оңго жылдыруу. Бул жалган иштөөлөрдү жок кылат жана статустарды так кылат.',
+                list: [
+                    'Свайп кокустандыктан сактануу керек болгон учурларда гана колдонулат (келүү жана төлөмдү кабыл алуу).',
+                    'Калган аракеттер – кадимки басуу.'
+                ],
+                highlight: 'Сиз үчүн эмне өзгөрөт: «мен баспадым, өзү бүтүп калды» дегендер болбойт. Так ырааттуулук: келди → свайп → көтөрүлдү → өткөрдү → бүтүрдү.'
+            },
+            module2: {
+                title: '2. Алгоритм',
+                subtitle: 'Негизгиси',
+                step1: 'Жеткирүү дарегине токтогондон кийин, унаадан чыкпай туруп (унаадан чыгаар алдында) — «На месте» баскычы боюнча свайп. Андан кийин жашыл баннер «Прибытие подтверждено» пайда болот. Андан кийин гана улантыңыз.',
+                step2_1: 'Накталай же карта менен төлөм: «Принять оплату» баскычы боюнча свайп.',
+                step2_2: 'Онлайн төлөм: «Завершить заказ» баскычына басыңыз (кадимки басуу).',
+                step3: 'Конок эшикти ачпаса: 3 жолу 20 секунддан чалыңыз. Жооп бербесе – кызыл баскычты «Не дозвонился» басыңыз.',
+                step4: '«Не дозвонился» кийин: эшиктин алдында күтпөңүз, башка заказдарга кетиңиз. Колдоо кызматы тастыктагандан кийин гана «Вернуться к заказам» аркылуу кайта аласыз.',
+                badge: 'Ырааттуулукту эстеңиз'
+            },
+            module3: {
+                title: '3. «3 × 20» протоколу',
+                subtitle: 'Толук маалымат',
+                why: '3 аракет – конок угуп, келүүгө үлгүрүшү үчүн жетиштүү минимум. 20 секунд – күтүүнүн стандарттык убактысы, ал көпкө созулбайт, биро жооп берүүгө мүмкүнчүлүк берет.',
+                list: [
+                    'Чалуу учурунда өзүңүзгө 20га чейин санаңыз.',
+                    'Эгер 20 секундга чейин таштап койсоңуз – чалуу эсептелбейт, кайталоо керек.',
+                    'Үч толук аракеттен кийин гана «Не дозвонился» баскычы.'
+                ],
+                highlight: 'Маанилүү: Эгер конок кийин чалса – сиз кайта аласыз, бирок «Вернуться к заказам» баскычы аркылуу гана (ал колдоо кызматы тастыктагандан кийин активдүү болот).'
+            },
+            module4: {
+                title: '4. Көп кездешкен каталар',
+                subtitle: 'Алардан кантип сактануу керек',
+                errors: [
+                    { error: '«На месте» баскычын подъездде же эшикте баскан.', correct: 'Унаадан чыкпай туруп басыңыз – бул убакытты так эсептөө үчүн маанилүү.' },
+                    { error: 'Свайптын ордуна жөн гана басып койду – статус орнотулган жок.', correct: 'Жашыл баннер көрүнгөнчө жебени аягына чейин сүйрөңүз.' },
+                    { error: '1 жолу чалып, дароо «Не дозвонился» баскан.', correct: 'Катуу 3 жолу 20 секунддан чалыңыз.' },
+                    { error: '«Не дозвонился» кийин эшикте күтүп калган.', correct: 'Дароо кетиңиз, кийин кайтасыз.' }
+                ]
+            },
+            test: {
+                title: '5. Көзөмөл суроолору',
+                subtitle: 'Өзүңүздү текшериңиз',
+                questions: [
+                    {
+                        question: '1. «На месте» свайбын качан жасоо керек?',
+                        options: [
+                            'Көтөрүлүп чыккандан кийин',
+                            'Жеткирүү дарегине келгенден кийин, унаадан чыкпай туруп (унаадан чыгаар алдында)',
+                            'Домофонго чалгандан кийин'
+                        ],
+                        correct: 1,
+                        explanation: '«На месте» свайбын унаадан чыкпай туруп (унаадан чыгаар алдында), имаратка кирерден мурун жасоо керек. Бул жеткирүү убактысын так эсептөөгө жана конок үчүн ачыктыкты камсыздайт.'
+                    },
+                    {
+                        question: '2. Конок эшикти ачпаса, канча жолу чалуу керек?',
+                        options: ['1 жолу', '2 жолу', '3 жолу'],
+                        correct: 2,
+                        explanation: 'Протокол так 3 чалууну талап кылат. Азыраак — регламентти бузуу, көбүрөөк — убакытты кечиктирүү.'
+                    },
+                    {
+                        question: '3. Ар бир чалууда канча убакыт күтүү керек?',
+                        options: ['10 секунд', '20 секунд', '30 секунд'],
+                        correct: 1,
+                        explanation: 'Ар бир чалуу 20 секундтан кем эмес убакытка созулушу керек. Бул стандарт конокко телефонго жетүүгө мүмкүнчүлүк берет.'
+                    },
+                    {
+                        question: '4. «На месте» свайбы ийгиликтүү болгондон кийин эмне пайда болот?',
+                        options: [
+                            '«Ожидание» кызыл баннери',
+                            '«Прибытие подтверждено» жашыл баннери',
+                            '«Заказ принят» көк баннери'
+                        ],
+                        correct: 1,
+                        explanation: 'Ийгиликтүү свайптан кийин жашыл баннер «Прибытие подтверждено» пайда болот — бул конокко карай уланса болот деген белги.'
+                    },
+                    {
+                        question: '5. Эгер заказ онлайн төлөнгөн болсо, кайсы баскыч менен бүтүрөт?',
+                        options: [
+                            '«Принять оплату» (свайп)',
+                            '«Завершить заказ» (басуу)',
+                            '«Не дозвонился»'
+                        ],
+                        correct: 1,
+                        explanation: 'Онлайн төлөмдө «Завершить заказ» баскычы колдонулат — кадимки басуу, свайпсыз, себеби төлөм буга чейин жүргүзүлгөн.'
+                    },
+                    {
+                        question: '6. «Не дозвонился» баскандан кийин эмне кылуу керек?',
+                        options: [
+                            'Эшиктин алдында 10 мүнөт күтүү',
+                            'Кетип, башка заказдарды жеткирүү',
+                            '5 мүнөттөн кийин кайра чалуу'
+                        ],
+                        correct: 1,
+                        explanation: '«Не дозвонился» кийин статус акыркы болуп саналат, курьер даректи таштап, кийинки заказды жеткирүүгө милдеттүү. Күтүүгө тыюу салынат.'
+                    }
+                ]
+            },
+            checklist: {
+                title: '6. Курьердин чек-листи',
+                subtitle: 'Сменага даярдык',
+                items: [
+                    'Мен свайп – солдон оңго жылдыруу экенин билем, басуу эмес.',
+                    'Мен «На месте» унаадан чыкпай туруп (унаадан чыгаар алдында) басам.',
+                    'Мен «Прибытие подтверждено» жашыл баннерин күтөм.',
+                    'Мен айырмалайм: курьерге төлөм үчүн свайп жана онлайн төлөм үчүн басуу.',
+                    'Мен 3 жолу 20 секунддан чалуу эрежесин эстейм.',
+                    'Мен «Не дозвонился» кийин кетүү керектигин билем.',
+                    'Мен «Вернуться к заказам» аркылуу гана кайта аларымды билем.'
+                ]
+            },
+            final: {
+                title: 'Куттуктайбыз!',
+                subtitle: 'Сиз жаңы алгоритм боюнча окууну ийгиликтүү аяктадыңыз.',
+                scoreText: 'Сиздин упайларыңыз:',
+                certificate: {
+                    title: '📜 Окуу сертификаты',
+                    text1: 'Ушул менен тастыкталат,',
+                    name: 'Аты',
+                    text2: 'жаңы заказ өткөрүү алгоритмин ийгиликтүү өздөштүрдү',
+                    text3: 'жана билимин тест аркылуу тастыктады',
+                    meta: 'Датасы: {date} • Доставка Экспресс'
+                }
+            },
+            buttons: {
+                start: 'Окууну баштоо',
+                next: 'Кийинки',
+                back: 'Артка',
+                submitTest: 'Тестти бүтүрүү',
+                goToChecklist: 'Чек-листке өтүү',
+                finish: 'Окууну аяктоо',
+                restart: 'Кайрадан өтүү'
+            }
         },
-        {
-            question: '3. Как долго ждать ответа при каждом звонке?',
-            options: ['10 секунд', '20 секунд', '30 секунд'],
-            correct: 1,
-            explanation: 'Каждый звонок должен длиться не менее 20 секунд. Это стандарт, который даёт гостю время подойти к телефону.'
+        tg: {
+            langName: 'Тоҷикӣ',
+            welcome: {
+                title: '🚀 Алгоритми нави «На месте»',
+                subtitle: 'Алгоритми интиқоли фармоиш барои курьер',
+                greeting: 'Салом, курьер! Мо раванди интиқолро барои беҳтар ва боэътимодтар кардан навсозӣ кардем.',
+                list: [
+                    'Фаҳмед, ки чаро механизми свайп-ро ҷорӣ кардем',
+                    'Алгоритми қадам ба қадамро омӯзед',
+                    'Протоколи «3 × 20»-ро азхуд кунед',
+                    'Аз санҷиш ва чек-лист гузаред'
+                ],
+                highlight: 'Барои ҳар қадам холҳо мегиред. Ҳадди аксар — 100 хол ва сертификати номӣ!',
+                nameLabel: 'Номи шумо (барои сертификат):',
+                namePlaceholder: 'Ном ва насабро ворид кунед',
+                button: 'Оғози таълим'
+            },
+            module1: {
+                title: '1. Чаро алгоритмро иваз мекунем?',
+                subtitle: 'Чаро свайп беҳтар аз пахш кардан аст',
+                problem: 'Қаблан курьерҳо метавонистанд тугмаро дар киса ё ҳангоми интиқоли телефон ба таври тасодуфӣ пахш кунанд – фармоиш пеш аз вақт ба итмом мерасид, меҳмон огоҳӣ дар бораи расидан намегирифт, ихтилофот ва зангҳои иловагӣ ба дастгирӣ ба вуҷуд меомаданд.',
+                solution: 'Мо механизми свайп-ро ҷорӣ мекунем – ҳаракати ангушт аз чап ба рост. Ин амалиёти бардурӯғро истисно мекунад ва ҳолатҳоро дақиқ мекунад.',
+                list: [
+                    'Свайп танҳо дар ҷое истифода мешавад, ки пешгирӣ аз тасодуф муҳим аст (расидан ва қабули пардохт).',
+                    'Амалҳои боқимонда – пахши оддӣ.'
+                ],
+                highlight: 'Барои шумо чӣ тағйир меёбад: дигар «ман напахшидам, худаш тамом шуд» нест. Тартиби дақиқ: расид → свайп → боло рафт → супурд → тамом кард.'
+            },
+            module2: {
+                title: '2. Алгоритм',
+                subtitle: 'Асосӣ',
+                step1: 'Пас аз расидан ба суроғаи интиқол, бе аз мошин баромадан (пеш аз баромадан аз мошин) — свайп аз рӯи тугмаи «На месте». Баъд баннери сабз «Прибытие подтверждено» пайдо мешавад. Танҳо баъд аз ин идома диҳед.',
+                step2_1: 'Пардохти нақд ё корт ба курьер: свайп аз рӯи тугмаи «Принять оплату».',
+                step2_2: 'Пардохти онлайн: пахши тугмаи «Завершить заказ» (пахши оддӣ).',
+                step3: 'Меҳмон дарро накушуд: 3 бор ба 20 сония занг занед. Агар ҷавоб надод – тугмаи сурхи «Не дозвонился»-ро пахш кунед.',
+                step4: 'Пас аз «Не дозвонился»: дар назди дар интизор нашавед, ба фармоишҳои дигар равед. Танҳо пас аз тасдиқи дастгирӣ тавассути «Вернуться к заказам» баргардед.',
+                badge: 'Тартибро дар ёд доред'
+            },
+            module3: {
+                title: '3. Протоколи «3 × 20»',
+                subtitle: 'Тафсилот',
+                why: '3 кӯшиш – ҳадди ақали кофӣ барои он ки меҳмон шунавад ва биёяд. 20 сония – вақти стандартии интизорӣ, ки дароз намекашад, аммо имкони посух додан медиҳад.',
+                list: [
+                    'Ҳангоми занг задан, то 20 худ ба худ ҳисоб кунед.',
+                    'Агар то 20 сония қатъ кунед – занг ба ҳисоб намеравад, такрор кардан лозим.',
+                    'Пас аз се кӯшиши пурра – танҳо баъд тугмаи «Не дозвонился».'
+                ],
+                highlight: 'Муҳим: Агар меҳмон баъд занг зад – шумо метавонед баргардед, танҳо тавассути тугмаи «Вернуться к заказам» (пас аз тасдиқи дастгирӣ фаъол мешавад).'
+            },
+            module4: {
+                title: '4. Хатоҳои маъмулӣ',
+                subtitle: 'Чӣ тавр аз онҳо пешгирӣ кардан мумкин',
+                errors: [
+                    { error: 'Тугмаи «На месте»-ро дар подъезд ё дар назди дар пахш кард.', correct: 'Пеш аз баромадан аз мошин пахш кунед – ин барои ҳисоб кардани вақт муҳим аст.' },
+                    { error: 'Ба ҷои свайп танҳо пахш кард – ҳолат муқаррар нашуд.', correct: 'То он даме, ки баннери сабз намоён шавад, тирро то охир кашед.' },
+                    { error: '1 бор занг зад ва фавран «Не дозвонился» пахш кард.', correct: 'Қатъан 3 бор ба 20 сония занг занед.' },
+                    { error: 'Пас аз «Не дозвонился» дар назди дар монд.', correct: 'Фавран равед, баъд бармегардед.' }
+                ]
+            },
+            test: {
+                title: '5. Саволҳои санҷишӣ',
+                subtitle: 'Худро санҷед',
+                questions: [
+                    {
+                        question: '1. Кай бояд свайпи «На месте»-ро анҷом дод?',
+                        options: [
+                            'Баъд аз он ки боло рафт',
+                            'Ҳангоми расидан ба суроғаи интиқол, бе баромадан аз мошин (пеш аз баромадан)',
+                            'Баъд аз занг задан ба домофон'
+                        ],
+                        correct: 1,
+                        explanation: 'Свайпи «На месте»-ро пеш аз баромадан аз мошин, пеш аз ворид шудан ба бино анҷом додан лозим. Ин барои ҳисобкунии дақиқи вақти интиқол ва шаффофият барои меҳмон муҳим аст.'
+                    },
+                    {
+                        question: '2. Агар меҳмон дарро накушояд, чанд маротиба занг задан лозим?',
+                        options: ['1 маротиба', '2 маротиба', '3 маротиба'],
+                        correct: 2,
+                        explanation: 'Протокол дақиқан 3 зангро талаб мекунад. Камтар — вайрон кардани регламент, бештар — дер кардан.'
+                    },
+                    {
+                        question: '3. Ҳар зангро чанд вақт интизор шудан лозим?',
+                        options: ['10 сония', '20 сония', '30 сония'],
+                        correct: 1,
+                        explanation: 'Ҳар занг бояд на камтар аз 20 сония давом кунад. Ин стандартест, ки ба меҳмон имкон медиҳад ба телефон наздик шавад.'
+                    },
+                    {
+                        question: '4. Пас аз муваффақияти свайпи «На месте» чӣ пайдо мешавад?',
+                        options: [
+                            'Баннери сурх «Ожидание»',
+                            'Баннери сабз «Прибытие подтверждено»',
+                            'Баннери кабуд «Заказ принят»'
+                        ],
+                        correct: 1,
+                        explanation: 'Пас аз свайпи муваффақ баннери сабз «Прибытие подтверждено» пайдо мешавад — ин нишона он аст, ки метавон ба сӯи меҳмон идома дод.'
+                    },
+                    {
+                        question: '5. Агар фармоиш онлайн пардохт шуда бошад, бо кадом тугма ба итмом расонидан мумкин?',
+                        options: [
+                            '«Принять оплату» (свайп)',
+                            '«Завершить заказ» (пахш)',
+                            '«Не дозвонился»'
+                        ],
+                        correct: 1,
+                        explanation: 'Ҳангоми пардохти онлайн тугмаи «Завершить заказ» истифода мешавад — пахши оддӣ, бе свайп, зеро пардохт аллакай анҷом шудааст.'
+                    },
+                    {
+                        question: '6. Пас аз пахши «Не дозвонился» чӣ бояд кард?',
+                        options: [
+                            'Дар назди дар 10 дақиқа интизор шудан',
+                            'Рафтан ва фармоишҳои дигарро расонидан',
+                            'Пас аз 5 дақиқа дубора занг задан'
+                        ],
+                        correct: 1,
+                        explanation: 'Пас аз «Не дозвонился» ҳолат ниҳоӣ аст, курьер вазифадор аст суроғаро тарк кунад ва фармоиши навбатиро расонад. Интизорӣ манъ аст.'
+                    }
+                ]
+            },
+            checklist: {
+                title: '6. Чек-листи курьер',
+                subtitle: 'Тайёрӣ ба навбат',
+                items: [
+                    'Ман медонам, ки свайп – ҳаракати ангушт аз чап ба рост аст, на пахш.',
+                    'Ман «На месте»-ро пеш аз баромадан аз мошин пахш мекунам.',
+                    'Ман баннери сабзи «Прибытие подтверждено»-ро интизорам.',
+                    'Ман фарқ мекунам: свайп барои пардохт ба курьер ва пахш барои пардохти онлайн.',
+                    'Ман қоидаи 3 занги 20 сонияро дар ёд дорам.',
+                    'Ман медонам, ки пас аз «Не дозвонился» бояд равам.',
+                    'Ман медонам, ки танҳо тавассути «Вернуться к заказам» баргаштан мумкин аст.'
+                ]
+            },
+            final: {
+                title: 'Табрик!',
+                subtitle: 'Шумо таълимро оид ба алгоритми нав бомуваффақият гузаронед.',
+                scoreText: 'Холҳои шумо:',
+                certificate: {
+                    title: '📜 Сертификати таълим',
+                    text1: 'Бо ин тасдиқ карда мешавад, ки',
+                    name: 'Ном',
+                    text2: 'алгоритми нави интиқоли фармоишро бомуваффақият азхуд кард',
+                    text3: 'ва дониши худро бо санҷиш тасдиқ кард',
+                    meta: 'Сана: {date} • Доставка Экспресс'
+                }
+            },
+            buttons: {
+                start: 'Оғози таълим',
+                next: 'Баъд',
+                back: 'Бозгашт',
+                submitTest: 'Санҷишро анҷом диҳед',
+                goToChecklist: 'Ба чек-лист гузаред',
+                finish: 'Таълимро ба итмом расонед',
+                restart: 'Аз нав гузаред'
+            }
         },
-        {
-            question: '4. Что появляется после успешного свайпа «На месте»?',
-            options: [
-                'Красный баннер «Ожидание»',
-                'Зелёный баннер «Прибытие подтверждено»',
-                'Синий баннер «Заказ принят»'
-            ],
-            correct: 1,
-            explanation: 'После успешного свайпа появляется зелёный баннер «Прибытие подтверждено» — это сигнал, что можно идти дальше к гостю.'
-        },
-        {
-            question: '5. Если заказ оплачен онлайн, какой кнопкой завершать?',
-            options: [
-                '«Принять оплату» (свайп)',
-                '«Завершить заказ» (клик)',
-                '«Не дозвонился»'
-            ],
-            correct: 1,
-            explanation: 'При онлайн-оплате используется кнопка «Завершить заказ» — обычный клик, без свайпа, потому что оплата уже проведена.'
-        },
-        {
-            question: '6. После нажатия «Не дозвонился» что нужно сделать?',
-            options: [
-                'Ждать у двери 10 минут',
-                'Уйти и доставлять другие заказы',
-                'Позвонить ещё раз через 5 минут'
-            ],
-            correct: 1,
-            explanation: 'После «Не дозвонился» статус финальный, курьер обязан покинуть адрес и доставить следующий заказ. Ожидание запрещено.'
+        uz: {
+            langName: 'Oʻzbekcha',
+            welcome: {
+                title: '🚀 Yangi “На месте” algoritmi',
+                subtitle: 'Buyurtmani yetkazish bo‘yicha kuryer algoritmi',
+                greeting: 'Salom, kuryer! Biz yetkazib berish jarayonini ishonchli va qulayroq qilish uchun yangiladik.',
+                list: [
+                    'Nega swype mexanizmini joriy qilganimizni bilib olasiz',
+                    'Bosqichma-bosqich algoritmni o‘rganasiz',
+                    '«3 × 20» protokolini o‘zlashtirasiz',
+                    'Test va checklistdan o‘tasiz'
+                ],
+                highlight: 'Har bir qadam uchun ball olasiz. Maksimal — 100 ball va nomli sertifikat!',
+                nameLabel: 'Ismingiz (sertifikat uchun):',
+                namePlaceholder: 'Ism va familiyangizni kiriting',
+                button: 'O‘qishni boshlash'
+            },
+            module1: {
+                title: '1. Nega algoritmni o‘zgartiramiz?',
+                subtitle: 'Nega swype bosishdan yaxshi',
+                problem: 'Ilgari kuryerlar cho‘ntagida yoki telefonni ko‘tarib yurganda tasodifan tugmani bosib qo‘yishgan – buyurtma muddatidan oldin tugagan, mehmon yetib kelgani haqida xabar olmagan, nizolar va qo‘llab-quvvatlash xizmatiga qo‘shimcha qo‘ng‘iroqlar bo‘lgan.',
+                solution: 'Biz swype mexanizmini joriy qilmoqdamiz – barmoqni chapdan o‘ngga surish. Bu noto‘g‘ri ishlashlarni bartaraf qiladi va holatlarni aniq qiladi.',
+                list: [
+                    'Swype faqat tasodifiylikning oldini olish muhim bo‘lgan joylarda qo‘llaniladi (kelish va to‘lovni qabul qilish).',
+                    'Qolgan harakatlar – oddiy bosish.'
+                ],
+                highlight: 'Siz uchun nima o‘zgaradi: endi «men bosmadim, o‘zi tugadi» degan gaplar bo‘lmaydi. Aniq ketma-ketlik: keldi → swype → ko‘tarildi → topshirdi → tugatdi.'
+            },
+            module2: {
+                title: '2. Algoritm',
+                subtitle: 'Asosiy',
+                step1: 'Yetkazib berish manziliga kelganingizdan so‘ng, mashinadan chiqmasdan turib (mashinadan chiqishdan oldin) — «На месте» tugmasi bo‘yicha swype. Keyin yashil banner «Прибытие подтверждено» paydo bo‘ladi. Shundan keyingina davom eting.',
+                step2_1: 'Naqd yoki karta bilan to‘lov: «Принять оплату» tugmasi bo‘yicha swype.',
+                step2_2: 'Onlayn to‘lov: «Завершить заказ» tugmasini bosing (oddiy bosish).',
+                step3: 'Mehmon eshikni ochmasa: 3 marta 20 soniyadan qo‘ng‘iroq qiling. Javob bermasa – qizil tugma «Не дозвонился» ni bosing.',
+                step4: '«Не дозвонился» dan keyin: eshik oldida kutmang, boshqa buyurtmalarga keting. Qo‘llab-quvvatlash tasdiqlaganidan keyingina «Вернуться к заказам» orqali qaytishingiz mumkin.',
+                badge: 'Ketma-ketlikni eslab qoling'
+            },
+            module3: {
+                title: '3. «3 × 20» protokoli',
+                subtitle: 'Tafsilotlar',
+                why: '3 urinish – mehmon eshitib, kelishiga yetarli minimal vaqt. 20 soniya – kutishning standart vaqti, u cho‘zilmaydi, lekin javob berish imkoniyatini beradi.',
+                list: [
+                    'Qo‘ng‘iroq qilayotganda o‘zingizga 20 gacha sanang.',
+                    'Agar 20 soniyagacha qo‘ysangiz – qo‘ng‘iroq hisoblanmaydi, takrorlash kerak.',
+                    'Uchta to‘liq urinishdan keyingina «Не дозвонился» tugmasi.'
+                ],
+                highlight: 'Muhim: Agar mehmon keyin qo‘ng‘iroq qilsa – siz qaytishingiz mumkin, faqat «Вернуться к заказам» tugmasi orqali (u qo‘llab-quvvatlash tasdiqlaganidan keyin faollashadi).'
+            },
+            module4: {
+                title: '4. Tez-tez uchraydigan xatolar',
+                subtitle: 'Ulardan qanday qochish kerak',
+                errors: [
+                    { error: '«На месте» tugmasini pod’ezdda yoki eshik oldida bosdi.', correct: 'Mashinadan chiqmasdan turib bosing – bu vaqtni aniq hisoblash uchun muhim.' },
+                    { error: 'Swype o‘rniga oddiy bosdi – holat o‘rnatilmadi.', correct: 'Yashil banner ko‘rinmaguncha o‘qni oxirigacha suring.' },
+                    { error: '1 marta qo‘ng‘iroq qilib, darhol «Не дозвонился» bosdi.', correct: 'Qat’iy 3 marta 20 soniyadan qo‘ng‘iroq qiling.' },
+                    { error: '«Не дозвонился» dan keyin eshik oldida kutib qoldi.', correct: 'Darhol keting, keyin qaytasiz.' }
+                ]
+            },
+            test: {
+                title: '5. Nazorat savollari',
+                subtitle: 'O‘zingizni tekshiring',
+                questions: [
+                    {
+                        question: '1. «На месте» swypesini qachon qilish kerak?',
+                        options: [
+                            'Ko‘tarilganidan keyin',
+                            'Yetkazib berish manziliga kelgandan so‘ng, mashinadan chiqmasdan turib (chiqishdan oldin)',
+                            'Domofonga qo‘ng‘iroq qilganidan keyin'
+                        ],
+                        correct: 1,
+                        explanation: '«На месте» swypesini mashinadan chiqmasdan turib (chiqishdan oldin), binoga kirishdan oldin qilish kerak. Bu yetkazib berish vaqtini aniq hisoblash va mehmon uchun shaffoflikni ta’minlaydi.'
+                    },
+                    {
+                        question: '2. Mehmon eshikni ochmasa, necha marta qo‘ng‘iroq qilish kerak?',
+                        options: ['1 marta', '2 marta', '3 marta'],
+                        correct: 2,
+                        explanation: 'Protokol aniq 3 ta qo‘ng‘iroqni talab qiladi. Kamroq — reglamentni buzish, ko‘proq — vaqtni kechiktirish.'
+                    },
+                    {
+                        question: '3. Har bir qo‘ng‘iroqda qancha vaqt kutish kerak?',
+                        options: ['10 soniya', '20 soniya', '30 soniya'],
+                        correct: 1,
+                        explanation: 'Har bir qo‘ng‘iroq kamida 20 soniya davom etishi kerak. Bu mehmonga telefonga yaqinlashish imkonini beradigan standart.'
+                    },
+                    {
+                        question: '4. Muvaffaqiyatli swype «На месте» dan keyin nima paydo bo‘ladi?',
+                        options: [
+                            'Qizil banner «Ожидание»',
+                            'Yashil banner «Прибытие подтверждено»',
+                            'Ko‘k banner «Заказ принят»'
+                        ],
+                        correct: 1,
+                        explanation: 'Muvaffaqiyatli swypedan keyin yashil banner «Прибытие подтверждено» paydo bo‘ladi — bu mehmonga qarab davom etish mumkinligining belgisi.'
+                    },
+                    {
+                        question: '5. Agar buyurtma onlayn to‘langan bo‘lsa, qaysi tugma bilan tugatish kerak?',
+                        options: [
+                            '«Принять оплату» (swype)',
+                            '«Завершить заказ» (bosish)',
+                            '«Не дозвонился»'
+                        ],
+                        correct: 1,
+                        explanation: 'Onlayn to‘lovda «Завершить заказ» tugmasi ishlatiladi — oddiy bosish, swypesiz, chunki to‘lov allaqachon amalga oshirilgan.'
+                    },
+                    {
+                        question: '6. «Не дозвонился» ni bosgandan keyin nima qilish kerak?',
+                        options: [
+                            'Eshik oldida 10 daqiqa kutish',
+                            'Ketib, boshqa buyurtmalarni yetkazish',
+                            '5 daqiqadan keyin yana qo‘ng‘iroq qilish'
+                        ],
+                        correct: 1,
+                        explanation: '«Не дозвонился» dan keyin holat yakuniy hisoblanadi, kuryer manzilni tark etib, keyingi buyurtmani yetkazishi shart. Kutish taqiqlanadi.'
+                    }
+                ]
+            },
+            checklist: {
+                title: '6. Kuryer checklisti',
+                subtitle: 'Smenaga tayyorgarlik',
+                items: [
+                    'Men swype – chapdan o‘ngga surish ekanligini bilaman, bosish emas.',
+                    'Men «На месте» ni mashinadan chiqmasdan turib (chiqishdan oldin) bosaman.',
+                    'Men «Прибытие подтверждено» yashil bannerini kutaman.',
+                    'Men farqlayman: kuryerga to‘lov uchun swype va onlayn to‘lov uchun bosish.',
+                    'Men 3 marta 20 soniyadan qo‘ng‘iroq qilish qoidasini eslayman.',
+                    'Men «Не дозвонился» dan keyin ketish kerakligini bilaman.',
+                    'Men faqat «Вернуться к заказам» orqali qaytish mumkinligini bilaman.'
+                ]
+            },
+            final: {
+                title: 'Tabriklaymiz!',
+                subtitle: 'Siz yangi algoritm bo‘yicha o‘qishni muvaffaqiyatli yakunladingiz.',
+                scoreText: 'Sizning ballaringiz:',
+                certificate: {
+                    title: '📜 O‘quv sertifikati',
+                    text1: 'Shu bilan tasdiqlanadiki,',
+                    name: 'Ism',
+                    text2: 'yangi buyurtma yetkazish algoritmini muvaffaqiyatli o‘zlashtirdi',
+                    text3: 'va bilimini test orqali tasdiqladi',
+                    meta: 'Sana: {date} • Доставка Экспресс'
+                }
+            },
+            buttons: {
+                start: 'O‘qishni boshlash',
+                next: 'Keyingi',
+                back: 'Orqaga',
+                submitTest: 'Testni tugatish',
+                goToChecklist: 'Checklistga o‘tish',
+                finish: 'O‘qishni yakunlash',
+                restart: 'Qaytadan o‘tish'
+            }
         }
-    ];
+    };
 
-    // Состояние
+    // ============================
+    // СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+    // ============================
+    let currentLang = 'ru';
     let currentStep = 0;
-    const totalSteps = 8;
+    const totalSteps = 8; // 0-7
     let score = 0;
     let testSubmitted = false;
-    let testPassed = false;
     let userName = '';
+    let selectedOptions = {};
+    let checklistChecked = 0;
 
-    const checklistItems = [
-        'Я знаю, что свайп – это движение слева направо, а не нажатие.',
-        'Я буду нажимать «На месте», не покидая ТС (до выхода из машины).',
-        'Я буду ждать зелёный баннер «Прибытие подтверждено».',
-        'Я различаю: свайп для оплаты курьеру и клик для онлайн-оплаты.',
-        'Я помню правило 3 звонков по 20 секунд.',
-        'Я знаю, что после «Не дозвонился» нужно уходить.',
-        'Я знаю, что вернуться можно только через «Вернуться к заказам».'
-    ];
-
-    const steps = document.querySelectorAll('.step');
+    // Элементы DOM
+    const languageSelector = document.getElementById('languageSelector');
+    const appContent = document.getElementById('appContent');
+    const langGrid = document.getElementById('langGrid');
+    const btnContinue = document.getElementById('btnContinue');
+    const langSwitcher = document.getElementById('langSwitcher');
+    const stepContainer = document.getElementById('stepContainer');
     const progressFill = document.getElementById('progressFill');
     const stepIndicator = document.getElementById('stepIndicator');
     const scoreValue = document.getElementById('scoreValue');
     const userNameInput = document.getElementById('userNameInput');
 
-    function init() {
-        renderTest();
-        renderChecklist();
-        updateUI();
-        userNameInput.addEventListener('input', function() {
-            userName = this.value.trim();
-        });
-        document.getElementById('goToChecklistBtn').classList.add('hidden');
+    // ============================
+    // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    // ============================
+    function getText(path) {
+        const parts = path.split('.');
+        let obj = TRANSLATIONS[currentLang];
+        for (let p of parts) {
+            if (obj && obj[p] !== undefined) obj = obj[p];
+            else return path;
+        }
+        return obj;
     }
 
-    function goToStep(step) {
-        if (step < 0 || step >= totalSteps) return;
-        // ★★★ ИСПРАВЛЕНИЕ: за каждый учебный модуль (шаги 1-4) начисляем 15 очков вместо 10 ★★★
-        if (step >= 1 && step <= 4 && !steps[step].dataset.visited) {
-            steps[step].dataset.visited = 'true';
-            addScore(15);   // <-- было 10, стало 15
-        }
-        steps.forEach((el, i) => {
-            el.classList.toggle('active', i === step);
+    function t(path) {
+        return getText(path);
+    }
+
+    // ============================
+    // УПРАВЛЕНИЕ ЯЗЫКОМ
+    // ============================
+    function setLanguage(lang) {
+        currentLang = lang;
+        // Обновить активную кнопку в языковом переключателе
+        document.querySelectorAll('#langSwitcher button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
         });
-        currentStep = step;
-        updateUI();
-        if (step === 7) {
-            document.getElementById('finalScore').textContent = score;
+        // Перерисовать всё обучение
+        renderAll();
+        // Обновить имя в сертификате, если на финальном шаге
+        if (currentStep === 7) {
             generateCertificate();
         }
-        if (step === 6) {
-            document.getElementById('goToChecklistBtn').classList.add('hidden');
+    }
+
+    // ============================
+    // РЕНДЕРИНГ ШАГОВ
+    // ============================
+    function renderStep0() {
+        const w = t('welcome');
+        let html = `
+            <div class="step active" data-step="0">
+                <h2>${w.title}</h2>
+                <div class="subtitle">${w.subtitle}</div>
+                <div class="card-content">
+                    <p><strong>${w.greeting}</strong></p>
+                    <p>${t('welcome.listPrefix') || 'В этом обучении ты:'}</p>
+                    <ul>
+                        ${w.list.map(item => `<li><i class="fas fa-check-circle"></i> ${item}</li>`).join('')}
+                    </ul>
+                    <div class="highlight">
+                        <i class="fas fa-gem" style="color: var(--primary);"></i> ${w.highlight}
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <label style="font-weight: 600; font-size: 15px; color: #2d1f17;">${w.nameLabel}</label>
+                        <input type="text" id="userNameInput" placeholder="${w.namePlaceholder}" value="${userName}" style="width: 100%; padding: 10px 16px; border-radius: 14px; border: 2px solid rgba(205,92,92,0.2); font-size: 15px; margin-top: 4px; background: rgba(255,255,255,0.6);">
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <span></span>
+                    <button class="btn btn-primary" onclick="nextStep()">${t('buttons.start')} <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        `;
+        return html;
+    }
+
+    function renderStep1() {
+        const m = t('module1');
+        return `
+            <div class="step" data-step="1">
+                <h2>${m.title}</h2>
+                <div class="subtitle">${m.subtitle}</div>
+                <div class="card-content">
+                    <p><strong>${m.problem}</strong></p>
+                    <p><strong>${m.solution}</strong></p>
+                    <ul>
+                        ${m.list.map(item => `<li><i class="fas fa-arrow-right"></i> ${item}</li>`).join('')}
+                    </ul>
+                    <div class="highlight">
+                        <i class="fas fa-check-circle" style="color: var(--primary);"></i> <strong>${m.highlight}</strong>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> ${t('buttons.back')}</button>
+                    <button class="btn btn-primary" onclick="nextStep()">${t('buttons.next')} <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderStep2() {
+        const m = t('module2');
+        return `
+            <div class="step" data-step="2">
+                <h2>${m.title}</h2>
+                <div class="subtitle">${m.subtitle}</div>
+                <div class="card-content">
+                    <p><strong>${m.step1}</strong></p>
+                    <p><strong>${m.step2_1}</strong></p>
+                    <p><strong>${m.step2_2}</strong></p>
+                    <p><strong>${m.step3}</strong></p>
+                    <p><strong>${m.step4}</strong></p>
+                    <div class="badge-step"><i class="far fa-clock"></i> ${m.badge}</div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> ${t('buttons.back')}</button>
+                    <button class="btn btn-primary" onclick="nextStep()">${t('buttons.next')} <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderStep3() {
+        const m = t('module3');
+        return `
+            <div class="step" data-step="3">
+                <h2>${m.title}</h2>
+                <div class="subtitle">${m.subtitle}</div>
+                <div class="card-content">
+                    <p><strong>${m.why}</strong></p>
+                    <ul>
+                        ${m.list.map(item => `<li><i class="fas fa-phone"></i> ${item}</li>`).join('')}
+                    </ul>
+                    <div class="highlight">
+                        <i class="fas fa-undo-alt" style="color: var(--copper);"></i> <strong>${m.highlight}</strong>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> ${t('buttons.back')}</button>
+                    <button class="btn btn-primary" onclick="nextStep()">${t('buttons.next')} <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderStep4() {
+        const m = t('module4');
+        let html = `
+            <div class="step" data-step="4">
+                <h2>${m.title}</h2>
+                <div class="subtitle">${m.subtitle}</div>
+                <div class="card-content">
+                    <ul>
+        `;
+        m.errors.forEach(e => {
+            html += `<li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>${e.error}</strong><br><i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>${e.correct}</strong></li>`;
+        });
+        html += `
+                    </ul>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> ${t('buttons.back')}</button>
+                    <button class="btn btn-primary" onclick="nextStep()">${t('buttons.next')} <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        `;
+        return html;
+    }
+
+    function renderStep5() {
+        const test = t('test');
+        let html = `
+            <div class="step" data-step="5">
+                <h2>${test.title}</h2>
+                <div class="subtitle">${test.subtitle}</div>
+                <div class="card-content" id="testContainer">
+        `;
+        test.questions.forEach((q, idx) => {
+            html += `<div class="question" data-q="${idx}">`;
+            html += `<p>${q.question}</p>`;
+            html += `<div class="options">`;
+            q.options.forEach((opt, optIdx) => {
+                html += `<div class="option" data-q="${idx}" data-opt="${optIdx}" onclick="selectOption(${idx}, ${optIdx})">${opt}</div>`;
+            });
+            html += `</div>`;
+            html += `</div>`;
+        });
+        html += `
+                </div>
+                <div id="testResultContainer" style="display: none;"></div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> ${t('buttons.back')}</button>
+                    <button class="btn btn-success" id="submitTestBtn" onclick="submitTest()">${t('buttons.submitTest')}</button>
+                    <button class="btn btn-primary hidden" id="goToChecklistBtn" onclick="goToStep(6)">${t('buttons.goToChecklist')} <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        `;
+        return html;
+    }
+
+    function renderStep6() {
+        const cl = t('checklist');
+        let html = `
+            <div class="step" data-step="6">
+                <h2>${cl.title}</h2>
+                <div class="subtitle">${cl.subtitle}</div>
+                <div class="card-content" id="checklistContainer">
+        `;
+        cl.items.forEach((item, idx) => {
+            html += `
+                <div class="checklist-item">
+                    <input type="checkbox" id="chk${idx}" onchange="updateChecklist()">
+                    <label for="chk${idx}">${item}</label>
+                </div>
+            `;
+        });
+        html += `
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> ${t('buttons.back')}</button>
+                    <button class="btn btn-success" id="finishBtn" onclick="finishCourse()">${t('buttons.finish')} <i class="fas fa-graduation-cap"></i></button>
+                </div>
+            </div>
+        `;
+        return html;
+    }
+
+    function renderStep7() {
+        const f = t('final');
+        const dateStr = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+        const meta = f.certificate.meta.replace('{date}', dateStr);
+        return `
+            <div class="step" data-step="7">
+                <div class="final">
+                    <div class="big-icon"><i class="fas fa-trophy"></i></div>
+                    <h2>${f.title}</h2>
+                    <p style="font-size: 18px; color: #3f332a;">${f.subtitle}</p>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p style="font-size: 20px; font-weight: 600;">${f.scoreText} <span class="score-final" id="finalScore">${score}</span></p>
+
+                    <div class="certificate" id="certificateArea">
+                        <h3>${f.certificate.title}</h3>
+                        <p>${f.certificate.text1}</p>
+                        <div class="name" id="certName">${userName || f.certificate.name}</div>
+                        <p>${f.certificate.text2}</p>
+                        <p style="font-size: 14px; color: #5a4a3a;">${f.certificate.text3}</p>
+                        <div class="meta">${meta}</div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="location.reload()"><i class="fas fa-redo"></i> ${t('buttons.restart')}</button>
+                    </div>
+                    <canvas id="certCanvas" width="800" height="500"></canvas>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderAll() {
+        // Сохраняем текущий шаг, но пересоздаём все шаги
+        const stepsHtml = [
+            renderStep0(),
+            renderStep1(),
+            renderStep2(),
+            renderStep3(),
+            renderStep4(),
+            renderStep5(),
+            renderStep6(),
+            renderStep7()
+        ];
+        stepContainer.innerHTML = stepsHtml.join('');
+
+        // Показать нужный шаг
+        stepsHtml.forEach((_, i) => {
+            const stepEl = document.querySelector(`.step[data-step="${i}"]`);
+            if (stepEl) stepEl.classList.toggle('active', i === currentStep);
+        });
+
+        // Обновить прогресс
+        updateUI();
+
+        // Сбросить состояние теста и чек-листа, если мы не на соответствующих шагах
+        // Однако мы не сбрасываем глобальные состояния, чтобы сохранить прогресс.
+        // Но при смене языка мы должны перерисовать тест и чеклист с текущими выбранными ответами.
+        // Лучше просто перерисовать, и состояние восстановится из переменных.
+        // Поэтому после рендера нужно восстановить выбранные ответы в тесте.
+        if (currentStep === 5) {
+            // Восстановить выбранные ответы
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => {
+                const qIdx = parseInt(opt.dataset.q);
+                const optIdx = parseInt(opt.dataset.opt);
+                if (selectedOptions[qIdx] === optIdx) {
+                    opt.classList.add('selected');
+                }
+            });
+            // Если тест уже сдан, показать результаты
+            if (testSubmitted) {
+                showTestResults();
+            }
+        }
+        if (currentStep === 6) {
+            // Восстановить чек-лист
+            const checkboxes = document.querySelectorAll('#checklistContainer input[type="checkbox"]');
+            // Мы не храним состояния чекбоксов, поэтому оставляем их пустыми (пользователь заново отметит)
+            // Но если мы хотим сохранить, нужно хранить массив состояний, сейчас не будем усложнять.
+        }
+        // Обновить имя в инпуте
+        const nameInput = document.getElementById('userNameInput');
+        if (nameInput) nameInput.value = userName;
+        // Обновить кнопку перехода к чек-листу
+        const goBtn = document.getElementById('goToChecklistBtn');
+        if (goBtn) {
+            if (testSubmitted) goBtn.classList.remove('hidden');
+            else goBtn.classList.add('hidden');
+        }
+        // Обновить кнопку теста
+        const submitBtn = document.getElementById('submitTestBtn');
+        if (submitBtn) {
+            if (testSubmitted) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = t('buttons.submitTest') + ' (пройден)';
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.textContent = t('buttons.submitTest');
+            }
+        }
+        // Если мы на финальном шаге, обновить сертификат
+        if (currentStep === 7) {
+            generateCertificate();
+        }
+    }
+
+    // ============================
+    // УПРАВЛЕНИЕ ШАГАМИ
+    // ============================
+    function goToStep(step) {
+        if (step < 0 || step >= totalSteps) return;
+        // Начисление очков за модули (шаги 1-4)
+        if (step >= 1 && step <= 4 && !document.querySelector(`.step[data-step="${step}"]`).dataset.visited) {
+            document.querySelector(`.step[data-step="${step}"]`).dataset.visited = 'true';
+            addScore(15);
+        }
+        currentStep = step;
+        renderAll();
+        updateUI();
+        if (step === 7) {
+            generateCertificate();
         }
     }
 
     function nextStep() {
         if (currentStep === 5 && !testSubmitted) {
-            alert('Пожалуйста, сначала пройдите тест, нажав "Завершить тест".');
+            alert(t('test.alert') || 'Пожалуйста, сначала пройдите тест, нажав "Завершить тест".');
             return;
         }
         if (currentStep === 6) {
@@ -860,12 +1720,12 @@
             let allChecked = true;
             checkboxes.forEach(cb => { if (!cb.checked) allChecked = false; });
             if (!allChecked) {
-                alert('Отметьте все пункты чек-листа, чтобы завершить обучение.');
+                alert(t('checklist.alert') || 'Отметьте все пункты чек-листа, чтобы завершить обучение.');
                 return;
             }
-            if (!document.getElementById('checklistContainer').dataset.scored) {
+            if (!document.querySelector('.step[data-step="6"]').dataset.scored) {
                 addScore(10);
-                document.getElementById('checklistContainer').dataset.scored = 'true';
+                document.querySelector('.step[data-step="6"]').dataset.scored = 'true';
             }
         }
         goToStep(currentStep + 1);
@@ -894,32 +1754,14 @@
         else displayStep = currentStep;
         stepIndicator.textContent = `${displayStep} / 6`;
         scoreValue.textContent = score;
+        // Обновить финальный счёт, если на финальном шаге
+        const finalScore = document.getElementById('finalScore');
+        if (finalScore) finalScore.textContent = score;
     }
 
-    // --- Тест ---
-    let selectedOptions = {};
-
-    function renderTest() {
-        const container = document.getElementById('testContainer');
-        let html = '';
-        testData.forEach((q, idx) => {
-            html += `<div class="question" data-q="${idx}">`;
-            html += `<p>${q.question}</p>`;
-            html += `<div class="options">`;
-            q.options.forEach((opt, optIdx) => {
-                html += `<div class="option" data-q="${idx}" data-opt="${optIdx}" onclick="selectOption(${idx}, ${optIdx})">${opt}</div>`;
-            });
-            html += `</div>`;
-            html += `</div>`;
-        });
-        container.innerHTML = html;
-        document.getElementById('testResultContainer').style.display = 'none';
-        document.getElementById('goToChecklistBtn').classList.add('hidden');
-        document.getElementById('submitTestBtn').classList.remove('hidden');
-        document.getElementById('submitTestBtn').disabled = false;
-        document.getElementById('submitTestBtn').textContent = 'Завершить тест';
-    }
-
+    // ============================
+    // ТЕСТ
+    // ============================
     function selectOption(qIdx, optIdx) {
         if (testSubmitted) return;
         const options = document.querySelectorAll(`.question[data-q="${qIdx}"] .option`);
@@ -928,18 +1770,11 @@
         selectedOptions[qIdx] = optIdx;
     }
 
-    function submitTest() {
-        if (testSubmitted) return;
-        for (let i = 0; i < testData.length; i++) {
-            if (selectedOptions[i] === undefined) {
-                alert(`Ответьте на вопрос ${i+1}`);
-                return;
-            }
-        }
-
+    function showTestResults() {
+        const test = t('test');
         let correctCount = 0;
         const resultHtml = [];
-        testData.forEach((q, idx) => {
+        test.questions.forEach((q, idx) => {
             const selected = selectedOptions[idx];
             const isCorrect = (selected === q.correct);
             if (isCorrect) correctCount++;
@@ -949,67 +1784,72 @@
             resultHtml.push(`
                 <div class="result-item ${passClass}">
                     <div class="q-text">${q.question}</div>
-                    <div class="answer">${isCorrect ? '✅ Правильно' : '❌ Неправильно'}</div>
-                    <div class="answer">Ваш ответ: ${userAnswer}</div>
-                    <div class="answer">Правильный ответ: <strong>${correctAnswer}</strong></div>
+                    <div class="answer">${isCorrect ? '✅ ' + (t('test.correct') || 'Правильно') : '❌ ' + (t('test.wrong') || 'Неправильно')}</div>
+                    <div class="answer">${t('test.yourAnswer') || 'Ваш ответ'}: ${userAnswer}</div>
+                    <div class="answer">${t('test.correctAnswer') || 'Правильный ответ'}: <strong>${correctAnswer}</strong></div>
                     <div class="explanation"><i class="fas fa-lightbulb" style="color: var(--copper);"></i> ${q.explanation}</div>
                 </div>
             `);
         });
-
         const container = document.getElementById('testResultContainer');
         container.innerHTML = `<div class="test-result">${resultHtml.join('')}</div>`;
         container.style.display = 'block';
-
         const earned = correctCount * 5;
         addScore(earned);
+        return correctCount;
+    }
 
+    function submitTest() {
+        if (testSubmitted) return;
+        const test = t('test');
+        for (let i = 0; i < test.questions.length; i++) {
+            if (selectedOptions[i] === undefined) {
+                alert(`Ответьте на вопрос ${i+1}`);
+                return;
+            }
+        }
+        const correctCount = showTestResults();
         testSubmitted = true;
-        testPassed = (correctCount === testData.length);
         document.getElementById('submitTestBtn').disabled = true;
-        document.getElementById('submitTestBtn').textContent = 'Тест пройден';
-
+        document.getElementById('submitTestBtn').textContent = t('buttons.submitTest') + ' ✓';
         document.getElementById('goToChecklistBtn').classList.remove('hidden');
     }
 
-    // --- Чек-лист ---
-    function renderChecklist() {
-        const container = document.getElementById('checklistContainer');
-        let html = '';
-        checklistItems.forEach((item, idx) => {
-            html += `<div class="checklist-item">`;
-            html += `<input type="checkbox" id="chk${idx}" onchange="updateChecklist()">`;
-            html += `<label for="chk${idx}">${item}</label>`;
-            html += `</div>`;
-        });
-        container.innerHTML = html;
+    // ============================
+    // ЧЕК-ЛИСТ
+    // ============================
+    function updateChecklist() {
+        // просто обновляем состояние
     }
-
-    function updateChecklist() {}
 
     function finishCourse() {
         const checkboxes = document.querySelectorAll('#checklistContainer input[type="checkbox"]');
         let allChecked = true;
         checkboxes.forEach(cb => { if (!cb.checked) allChecked = false; });
         if (!allChecked) {
-            alert('Отметьте все пункты чек-листа, чтобы завершить обучение.');
+            alert(t('checklist.alert') || 'Отметьте все пункты чек-листа, чтобы завершить обучение.');
             return;
         }
-        if (!document.getElementById('checklistContainer').dataset.scored) {
+        if (!document.querySelector('.step[data-step="6"]').dataset.scored) {
             addScore(10);
-            document.getElementById('checklistContainer').dataset.scored = 'true';
+            document.querySelector('.step[data-step="6"]').dataset.scored = 'true';
         }
         goToStep(7);
     }
 
-    // --- Сертификат ---
+    // ============================
+    // СЕРТИФИКАТ (canvas)
+    // ============================
     function generateCertificate() {
-        const name = userName || 'Курьер';
+        const name = userName || t('final.certificate.name') || 'Курьер';
         document.getElementById('certName').textContent = name;
         const now = new Date();
         const dateStr = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-        document.getElementById('certDate').textContent = dateStr;
+        const meta = t('final.certificate.meta').replace('{date}', dateStr);
+        document.querySelector('.certificate .meta').textContent = meta;
+
         const canvas = document.getElementById('certCanvas');
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const w = canvas.width, h = canvas.height;
         const grad = ctx.createLinearGradient(0, 0, w, h);
@@ -1028,11 +1868,11 @@
         ctx.font = 'bold 40px Inter, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('📜 Сертификат', w/2, 80);
+        ctx.fillText('📜 ' + (t('final.certificate.title') || 'Сертификат'), w/2, 80);
 
         ctx.font = '24px Inter, sans-serif';
         ctx.fillStyle = '#3f332a';
-        ctx.fillText('об обучении по программе', w/2, 140);
+        ctx.fillText(t('final.certificate.text1') || 'Настоящим подтверждается, что', w/2, 140);
 
         ctx.font = 'bold 48px Inter, sans-serif';
         ctx.fillStyle = '#800000';
@@ -1040,15 +1880,15 @@
 
         ctx.font = '22px Inter, sans-serif';
         ctx.fillStyle = '#3f332a';
-        ctx.fillText('успешно освоил алгоритм передачи заказа', w/2, 290);
+        ctx.fillText(t('final.certificate.text2') || 'успешно освоил новый алгоритм передачи заказа', w/2, 290);
 
         ctx.font = '18px Inter, sans-serif';
         ctx.fillStyle = '#5a4a3a';
-        ctx.fillText('и подтвердил свои знания тестированием', w/2, 340);
+        ctx.fillText(t('final.certificate.text3') || 'и подтвердил свои знания тестированием', w/2, 340);
 
         ctx.font = '16px Inter, sans-serif';
         ctx.fillStyle = '#8a7a6a';
-        ctx.fillText(`Дата: ${dateStr}  •  Доставка Экспресс`, w/2, 400);
+        ctx.fillText(meta, w/2, 400);
 
         ctx.font = '16px Inter, sans-serif';
         ctx.fillStyle = '#3f332a';
@@ -1068,7 +1908,68 @@
         canvas.dataset.generated = 'true';
     }
 
-    // Глобальные функции
+    // ============================
+    // ВЫБОР ЯЗЫКА
+    // ============================
+    let selectedLang = null;
+
+    langGrid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.lang-btn');
+        if (!btn) return;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedLang = btn.dataset.lang;
+        btnContinue.disabled = false;
+        // Поменять текст кнопки на выбранный язык
+        const langName = TRANSLATIONS[selectedLang]?.langName || selectedLang;
+        btnContinue.textContent = `Продолжить / Улантуу / Идома / Davom etish (${langName})`;
+    });
+
+    btnContinue.addEventListener('click', () => {
+        if (!selectedLang) return;
+        // Скрыть выбор языка, показать обучение
+        languageSelector.style.display = 'none';
+        appContent.classList.add('visible');
+        // Установить язык
+        setLanguage(selectedLang);
+        // Активировать переключатель
+        document.querySelectorAll('#langSwitcher button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === selectedLang);
+        });
+        // Инициализация
+        currentStep = 0;
+        renderAll();
+        updateUI();
+        // Подписаться на изменение имени
+        const nameInput = document.getElementById('userNameInput');
+        if (nameInput) {
+            nameInput.addEventListener('input', function() {
+                userName = this.value.trim();
+            });
+        }
+    });
+
+    // Переключатель языка в шапке
+    langSwitcher.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const lang = btn.dataset.lang;
+        if (lang === currentLang) return;
+        setLanguage(lang);
+        // Если мы на финальном шаге, обновить сертификат
+        if (currentStep === 7) {
+            generateCertificate();
+        }
+        // Обновить кнопки активные
+        document.querySelectorAll('#langSwitcher button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    });
+
+    // Инициализация (показываем выбор языка)
+    // По умолчанию скрываем обучение
+    appContent.classList.remove('visible');
+    languageSelector.style.display = 'flex';
+
+    // Для глобального доступа из onclick
     window.nextStep = nextStep;
     window.prevStep = prevStep;
     window.selectOption = selectOption;
@@ -1076,8 +1977,9 @@
     window.updateChecklist = updateChecklist;
     window.finishCourse = finishCourse;
     window.goToStep = goToStep;
-
-    init();
+    window.setLanguage = setLanguage;
+    window.renderAll = renderAll;
+    window.generateCertificate = generateCertificate;
 </script>
 </body>
 </html>
