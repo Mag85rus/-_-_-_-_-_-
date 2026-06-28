@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обучение курьеров — новый флоу</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF244C;
+            --terracotta: #CD5C5C;
+            --copper: #C74100;
+            --burgundy: #800000;
+            --bg-light: #f5f0eb;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --shadow: 0 8px 24px rgba(128, 0, 0, 0.08);
+            --radius: 28px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: radial-gradient(circle at 10% 30%, rgba(205, 92, 92, 0.08) 0%, transparent 50%),
+                              radial-gradient(circle at 90% 70%, rgba(199, 65, 0, 0.06) 0%, transparent 50%);
+        }
+
+        .app {
+            max-width: 820px;
+            width: 100%;
+            background: linear-gradient(145deg, #faf6f0, #f0e8df);
+            border-radius: var(--radius);
+            padding: 30px 32px 40px;
+            box-shadow: 0 20px 40px rgba(128, 0, 0, 0.12);
+            position: relative;
+            overflow: hidden;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(255,36,76,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .app::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: -60px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(199,65,0,0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(255,36,76,0.25);
+        }
+        .brand-text {
+            font-weight: 700;
+            font-size: 16px;
+            color: #3a2a22;
+        }
+        .brand-text span { color: var(--primary); }
+
+        .score-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .score {
+            background: rgba(255,36,76,0.12);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--burgundy);
+            border: 1px solid rgba(255,36,76,0.15);
+        }
+        .score i {
+            color: var(--primary);
+            margin-right: 6px;
+        }
+        .progress-indicator {
+            font-size: 14px;
+            font-weight: 600;
+            color: #5a4a3a;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(205, 92, 92, 0.2);
+            border-radius: 10px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--copper));
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        .step-container {
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .step h2 {
+            font-size: 26px;
+            font-weight: 900;
+            color: #2d1f17;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+        .step .subtitle {
+            font-size: 15px;
+            color: #5a4a3a;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+            padding-left: 14px;
+            opacity: 0.8;
+        }
+
+        .card-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(4px);
+            border-radius: 22px;
+            padding: 24px 26px;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .card-content p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #3f332a;
+            margin-bottom: 14px;
+        }
+        .card-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        .card-content ul li {
+            padding: 6px 0;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #3f332a;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .card-content ul li i {
+            color: var(--primary);
+            width: 20px;
+            margin-top: 3px;
+        }
+        .highlight {
+            background: rgba(255,36,76,0.06);
+            border-left: 4px solid var(--primary);
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin: 14px 0;
+        }
+
+        .badge-step {
+            display: inline-block;
+            background: rgba(205, 92, 92, 0.15);
+            color: var(--burgundy);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 30px;
+            border: 1px solid rgba(205, 92, 92, 0.2);
+        }
+
+        /* Тест */
+        .question {
+            margin-bottom: 22px;
+        }
+        .question p {
+            font-weight: 700;
+            font-size: 16px;
+            color: #2d1f17;
+            margin-bottom: 10px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .option {
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(205, 92, 92, 0.15);
+            border-radius: 14px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            color: #2d1f17;
+        }
+        .option:hover {
+            border-color: var(--terracotta);
+            background: rgba(255,255,255,0.7);
+        }
+        .option.selected {
+            border-color: var(--primary);
+            background: rgba(255,36,76,0.05);
+        }
+        .option.correct {
+            border-color: #2e7d32;
+            background: rgba(46, 125, 50, 0.08);
+        }
+        .option.wrong {
+            border-color: var(--primary);
+            background: rgba(255,36,76,0.08);
+        }
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        .option .feedback {
+            display: block;
+            font-size: 13px;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .option .feedback.correct { color: #2e7d32; }
+        .option .feedback.wrong { color: var(--primary); }
+
+        /* Детальный разбор после теста */
+        .test-result {
+            margin-top: 16px;
+        }
+        .test-result .result-item {
+            background: rgba(255,255,255,0.5);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+        }
+        .test-result .result-item.pass {
+            border-left-color: #2e7d32;
+        }
+        .test-result .result-item.fail {
+            border-left-color: var(--primary);
+        }
+        .test-result .result-item .q-text {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .test-result .result-item .answer {
+            font-size: 14px;
+            color: #3f332a;
+        }
+        .test-result .result-item .explanation {
+            font-size: 14px;
+            color: #5a4a3a;
+            margin-top: 4px;
+            background: rgba(0,0,0,0.02);
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+
+        /* Чек-лист */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(205, 92, 92, 0.08);
+        }
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+        .checklist-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .checklist-item label {
+            font-size: 15px;
+            color: #3f332a;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(255,255,255,0.6);
+            color: #3a2a22;
+            border: 1px solid rgba(205, 92, 92, 0.2);
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            box-shadow: 0 6px 14px rgba(255,36,76,0.25);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255,36,76,0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            transform: none;
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(205, 92, 92, 0.15);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.8);
+        }
+        .btn-success {
+            background: var(--copper);
+            color: #fff;
+            border: none;
+            box-shadow: 0 6px 14px rgba(199,65,0,0.25);
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(199,65,0,0.3);
+        }
+        .btn-success:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* Финальный экран с поздравлениями (без кнопок скачать/печать) */
+        .final {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .final .big-icon {
+            font-size: 72px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+        .final h2 {
+            font-size: 32px;
+        }
+        .final .score-final {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--copper));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .final .stars {
+            font-size: 32px;
+            letter-spacing: 6px;
+            color: #FFD700;
+            margin: 12px 0;
+        }
+
+        .certificate {
+            background: #fff;
+            padding: 24px 30px;
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            margin: 20px 0 16px;
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+        .certificate h3 {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--burgundy);
+        }
+        .certificate p {
+            font-size: 16px;
+            color: #3f332a;
+            margin: 6px 0;
+        }
+        .certificate .name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d1f17;
+            border-bottom: 2px dashed var(--primary);
+            display: inline-block;
+            padding: 0 20px 4px;
+            margin: 6px 0 10px;
+        }
+        .certificate .meta {
+            font-size: 13px;
+            color: #8a7a6a;
+            margin-top: 12px;
+        }
+
+        #certCanvas {
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 640px) {
+            .app {
+                padding: 20px 16px;
+                border-radius: 20px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .score-area {
+                justify-content: space-between;
+            }
+            .step h2 {
+                font-size: 22px;
+            }
+            .card-content {
+                padding: 18px 16px;
+            }
+            .btn {
+                min-width: 100px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+            .nav-buttons {
+                flex-direction: column;
+            }
+            .btn {
+                flex: none;
+                width: 100%;
+            }
+        }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .app {
+                box-shadow: none;
+                background: #fff;
+                border-radius: 0;
+                padding: 0.6cm;
+            }
+            .btn, .nav-buttons {
+                display: none !important;
+            }
+            .step {
+                display: block !important;
+                page-break-after: always;
+            }
+            .step.active {
+                display: block !important;
+            }
+            .certificate {
+                border: 2px solid #800000;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+    <!-- Шапка -->
+    <div class="header">
+        <div class="brand">
+            <div class="brand-icon"><i class="fas fa-route"></i></div>
+            <div class="brand-text">Доставка <span>•</span> Обучение</div>
+        </div>
+        <div class="score-area">
+            <span class="progress-indicator" id="stepIndicator">1 / 6</span>
+            <span class="score" id="scoreDisplay"><i class="fas fa-star"></i> <span id="scoreValue">0</span></span>
+        </div>
+    </div>
+
+    <!-- Прогресс-бар -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Контейнер шагов -->
+    <div class="step-container" id="stepContainer">
+        <!-- Шаг 0: Приветствие -->
+        <div class="step active" data-step="0">
+            <h2>🚀 Новый флоу «На месте»</h2>
+            <div class="subtitle">Курьерский алгоритм передачи заказа</div>
+            <div class="card-content">
+                <p><strong>Привет, курьер!</strong> Мы обновили процесс доставки, чтобы сделать его надёжнее и удобнее.</p>
+                <p>В этом обучении ты:</p>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> Узнаешь, зачем мы внедрили механику свайпов</li>
+                    <li><i class="fas fa-check-circle"></i> Изучишь пошаговый алгоритм из 4 шагов</li>
+                    <li><i class="fas fa-check-circle"></i> Освоишь протокол «3 × 20» для недозвонов</li>
+                    <li><i class="fas fa-check-circle"></i> Пройдёшь тест и чек-лист</li>
+                </ul>
+                <div class="highlight">
+                    <i class="fas fa-gem" style="color: var(--primary);"></i> За каждый шаг ты получаешь <strong>очки</strong>. Максимум — <strong>100 баллов</strong> и именной сертификат!
+                </div>
+                <div style="margin-top: 12px;">
+                    <label style="font-weight: 600; font-size: 15px; color: #2d1f17;">Ваше имя (для сертификата):</label>
+                    <input type="text" id="userNameInput" placeholder="Введите имя и фамилию" style="width: 100%; padding: 10px 16px; border-radius: 14px; border: 2px solid rgba(205,92,92,0.2); font-size: 15px; margin-top: 4px; background: rgba(255,255,255,0.6);">
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <span></span>
+                <button class="btn btn-primary" onclick="nextStep()">Начать обучение <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Шаг 1: Модуль 1 -->
+        <div class="step" data-step="1">
+            <h2>1. Зачем мы меняем флоу?</h2>
+            <div class="subtitle">Почему свайп лучше нажатия</div>
+            <div class="card-content">
+                <p><strong>Проблема:</strong> Раньше курьеры могли случайно нажать кнопку в кармане или при переноске телефона – заказ завершался раньше времени, гость не получал уведомление о прибытии, возникали споры и лишние звонки в поддержку.</p>
+                <p><strong>Решение:</strong> Мы вводим <strong>механику свайпа</strong> – движение пальцем слева направо. Это исключает ложные срабатывания и делает статусы точными.</p>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> Свайп используется только там, где важно избежать случайности (прибытие и приём оплаты).</li>
+                    <li><i class="fas fa-arrow-right"></i> Остальные действия – обычный клик.</li>
+                </ul>
+                <div class="highlight">
+                    <i class="fas fa-check-circle" style="color: var(--primary);"></i> <strong>Что меняется для вас:</strong> больше никаких «я не нажимал, само завершилось». Чёткая последовательность: приехал → свайп → поднялся → передал → завершил.
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
+                <button class="btn btn-primary" onclick="nextStep()">Далее <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Шаг 2: Модуль 2 (4 шага) -->
+        <div class="step" data-step="2">
+            <h2>2. Алгоритм «4 шага»</h2>
+            <div class="subtitle">Главное</div>
+            <div class="card-content">
+                <p><strong>Шаг 1. Прибытие</strong><br>
+                Как только остановились у дома – <strong>свайп</strong> по кнопке «На месте». После появится зелёный баннер «Прибытие подтверждено». Только после этого выходите.</p>
+                <p><strong>Шаг 2. Передача заказа</strong><br>
+                • <strong>Оплата наличными/картой курьеру:</strong> свайп по кнопке «Принять оплату».<br>
+                • <strong>Оплата онлайн:</strong> клик по кнопке «Завершить заказ».</p>
+                <p><strong>Шаг 3. Гость не открывает</strong><br>
+                Позвоните <strong>3 раза</strong> по <strong>20 секунд</strong>. Если не ответил – нажмите красную кнопку «Не дозвонился».</p>
+                <p><strong>Шаг 4. После «Не дозвонился»</strong><br>
+                Не ждите у двери, уходите на другие заказы. Вернуться можно только через «Вернуться к заказам» после подтверждения.</p>
+                <div class="badge-step"><i class="far fa-clock"></i> Запомните последовательность</div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
+                <button class="btn btn-primary" onclick="nextStep()">Далее <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Шаг 3: Модуль 3 (протокол) -->
+        <div class="step" data-step="3">
+            <h2>3. Протокол «3 × 20»</h2>
+            <div class="subtitle">Детали</div>
+            <div class="card-content">
+                <p><strong>Почему 3 звонка и 20 секунд?</strong><br>
+                3 попытки – достаточный минимум, чтобы гость успел услышать и подойти. 20 секунд – стандартное время ожидания, которое не затягивает, но даёт шанс ответить.</p>
+                <ul>
+                    <li><i class="fas fa-phone"></i> Держите телефон у уха, считайте про себя до 20.</li>
+                    <li><i class="fas fa-phone"></i> Если сбросили до 20 секунд – звонок не засчитывается, нужно повторить.</li>
+                    <li><i class="fas fa-phone"></i> После трёх полных попыток – только тогда кнопка «Не дозвонился».</li>
+                </ul>
+                <div class="highlight">
+                    <i class="fas fa-undo-alt" style="color: var(--copper);"></i> <strong>Важно:</strong> Если гость перезвонил позже – вы можете вернуться, но только по кнопке «Вернуться к заказам» (она активируется после подтверждения от поддержки).
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
+                <button class="btn btn-primary" onclick="nextStep()">Далее <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Шаг 4: Модуль 4 (частые ошибки) -->
+        <div class="step" data-step="4">
+            <h2>4. Частые ошибки</h2>
+            <div class="subtitle">Как их избежать</div>
+            <div class="card-content">
+                <ul>
+                    <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> Нажал «На месте» уже в подъезде или у двери.<br>
+                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Нажимайте сразу у машины – это важно для точного расчёта времени.</li>
+                    <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> Вместо свайпа просто кликнул – статус не установился.<br>
+                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Всегда тяните стрелку до конца, пока не увидите зелёный баннер.</li>
+                    <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> Позвонил 1 раз – сразу «Не дозвонился».<br>
+                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Строго 3 звонка по 20 секунд.</li>
+                    <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> После «Не дозвонился» остался ждать у двери.<br>
+                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Уходите сразу, вернётесь позже.</li>
+                </ul>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
+                <button class="btn btn-primary" onclick="nextStep()">Далее <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Шаг 5: Тест -->
+        <div class="step" data-step="5">
+            <h2>5. Контрольные вопросы</h2>
+            <div class="subtitle">Проверьте себя</div>
+            <div class="card-content" id="testContainer">
+                <!-- генерируется JS -->
+            </div>
+            <div id="testResultContainer" style="display: none;"></div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
+                <button class="btn btn-success" id="submitTestBtn" onclick="submitTest()">Завершить тест</button>
+                <button class="btn btn-primary hidden" id="goToChecklistBtn" onclick="goToStep(6)">Перейти к чек-листу <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Шаг 6: Чек-лист -->
+        <div class="step" data-step="6">
+            <h2>6. Чек-лист курьера</h2>
+            <div class="subtitle">Подготовка к смене</div>
+            <div class="card-content" id="checklistContainer">
+                <!-- генерируется JS -->
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Назад</button>
+                <button class="btn btn-success" id="finishBtn" onclick="finishCourse()">Завершить обучение <i class="fas fa-graduation-cap"></i></button>
+            </div>
+        </div>
+
+        <!-- Шаг 7: Финальный экран с поздравлениями (без скачать/печать) -->
+        <div class="step" data-step="7">
+            <div class="final">
+                <div class="big-icon"><i class="fas fa-trophy"></i></div>
+                <h2>Поздравляем!</h2>
+                <p style="font-size: 18px; color: #3f332a;">Вы успешно прошли обучение по новому флоу «На месте».</p>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p style="font-size: 20px; font-weight: 600;">Ваши очки: <span class="score-final" id="finalScore">0</span></p>
+
+                <!-- Сертификат остаётся для красоты, но без кнопок скачать/печать -->
+                <div class="certificate" id="certificateArea">
+                    <h3>📜 Сертификат об обучении</h3>
+                    <p>Настоящим подтверждается, что</p>
+                    <div class="name" id="certName">Имя</div>
+                    <p>успешно освоил новый алгоритм передачи заказа</p>
+                    <p style="font-size: 14px; color: #5a4a3a;">и подтвердил свои знания тестированием</p>
+                    <div class="meta">Дата: <span id="certDate"></span> • Доставка Экспресс</div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="location.reload()"><i class="fas fa-redo"></i> Пройти заново</button>
+                </div>
+                <canvas id="certCanvas" width="800" height="500"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Данные теста с пояснениями
+    const testData = [
+        {
+            question: '1. Когда нужно сделать свайп «На месте»?',
+            options: [
+                'После того как поднялся на этаж',
+                'Сразу по прибытии к дому, до выхода из машины',
+                'После того как позвонил в домофон'
+            ],
+            correct: 1,
+            explanation: 'Свайп «На месте» нужно делать сразу у машины, ещё до входа в здание. Это даёт точный расчёт времени доставки и прозрачность для гостя.'
+        },
+        {
+            question: '2. Сколько раз нужно позвонить гостю, если он не открывает дверь?',
+            options: ['1 раз', '2 раза', '3 раза'],
+            correct: 2,
+            explanation: 'Протокол требует ровно 3 звонка. Меньше — нарушение регламента, больше — задержка времени.'
+        },
+        {
+            question: '3. Как долго ждать ответа при каждом звонке?',
+            options: ['10 секунд', '20 секунд', '30 секунд'],
+            correct: 1,
+            explanation: 'Каждый звонок должен длиться не менее 20 секунд. Это стандарт, который даёт гостю время подойти к телефону.'
+        },
+        {
+            question: '4. Что появляется после успешного свайпа «На месте»?',
+            options: [
+                'Красный баннер «Ожидание»',
+                'Зелёный баннер «Прибытие подтверждено»',
+                'Синий баннер «Заказ принят»'
+            ],
+            correct: 1,
+            explanation: 'После успешного свайпа появляется зелёный баннер «Прибытие подтверждено» — это сигнал, что можно подниматься к гостю.'
+        },
+        {
+            question: '5. Если заказ оплачен онлайн, какой кнопкой завершать?',
+            options: [
+                '«Принять оплату» (свайп)',
+                '«Завершить заказ» (клик)',
+                '«Не дозвонился»'
+            ],
+            correct: 1,
+            explanation: 'При онлайн-оплате используется кнопка «Завершить заказ» — обычный клик, без свайпа, потому что оплата уже проведена.'
+        },
+        {
+            question: '6. После нажатия «Не дозвонился» что нужно сделать?',
+            options: [
+                'Ждать у двери 10 минут',
+                'Уйти и доставлять другие заказы',
+                'Позвонить ещё раз через 5 минут'
+            ],
+            correct: 1,
+            explanation: 'После «Не дозвонился» статус финальный, курьер обязан покинуть адрес и взять следующий заказ. Ожидание запрещено.'
+        }
+    ];
+
+    // Состояние
+    let currentStep = 0;
+    const totalSteps = 8; // 0-7
+    let score = 0;
+    let testSubmitted = false;
+    let testPassed = false;
+    let userName = '';
+
+    const checklistItems = [
+        'Я знаю, что свайп – это движение слева направо, а не нажатие.',
+        'Я буду нажимать «На месте» сразу у машины, до выхода.',
+        'Я буду ждать зелёный баннер «Прибытие подтверждено».',
+        'Я различаю: свайп для оплаты курьеру и клик для онлайн-оплаты.',
+        'Я помню правило 3 звонков по 20 секунд.',
+        'Я знаю, что после «Не дозвонился» нужно уходить.',
+        'Я знаю, что вернуться можно только через «Вернуться к заказам».'
+    ];
+
+    const steps = document.querySelectorAll('.step');
+    const progressFill = document.getElementById('progressFill');
+    const stepIndicator = document.getElementById('stepIndicator');
+    const scoreValue = document.getElementById('scoreValue');
+    const userNameInput = document.getElementById('userNameInput');
+
+    function init() {
+        renderTest();
+        renderChecklist();
+        updateUI();
+        userNameInput.addEventListener('input', function() {
+            userName = this.value.trim();
+        });
+        // Скрываем кнопку перехода к чек-листу изначально
+        document.getElementById('goToChecklistBtn').classList.add('hidden');
+    }
+
+    function goToStep(step) {
+        if (step < 0 || step >= totalSteps) return;
+        if (step >= 1 && step <= 4 && !steps[step].dataset.visited) {
+            steps[step].dataset.visited = 'true';
+            addScore(10);
+        }
+        steps.forEach((el, i) => {
+            el.classList.toggle('active', i === step);
+        });
+        currentStep = step;
+        updateUI();
+        if (step === 7) {
+            document.getElementById('finalScore').textContent = score;
+            generateCertificate();
+        }
+        if (step === 6) {
+            document.getElementById('goToChecklistBtn').classList.add('hidden');
+        }
+    }
+
+    function nextStep() {
+        if (currentStep === 5 && !testSubmitted) {
+            alert('Пожалуйста, сначала пройдите тест, нажав "Завершить тест".');
+            return;
+        }
+        if (currentStep === 6) {
+            const checkboxes = document.querySelectorAll('#checklistContainer input[type="checkbox"]');
+            let allChecked = true;
+            checkboxes.forEach(cb => { if (!cb.checked) allChecked = false; });
+            if (!allChecked) {
+                alert('Отметьте все пункты чек-листа, чтобы завершить обучение.');
+                return;
+            }
+            if (!document.getElementById('checklistContainer').dataset.scored) {
+                addScore(10);
+                document.getElementById('checklistContainer').dataset.scored = 'true';
+            }
+        }
+        goToStep(currentStep + 1);
+    }
+
+    function prevStep() {
+        goToStep(currentStep - 1);
+    }
+
+    function addScore(points) {
+        score += points;
+        updateUI();
+    }
+
+    function updateUI() {
+        let progress = 0;
+        if (currentStep >= 1 && currentStep <= 6) {
+            progress = ((currentStep) / 6) * 100;
+        } else if (currentStep === 7) {
+            progress = 100;
+        }
+        progressFill.style.width = progress + '%';
+        let displayStep = currentStep;
+        if (displayStep === 0) displayStep = 1;
+        else if (displayStep === 7) displayStep = 6;
+        else displayStep = currentStep;
+        stepIndicator.textContent = `${displayStep} / 6`;
+        scoreValue.textContent = score;
+    }
+
+    // --- Тест ---
+    let selectedOptions = {};
+
+    function renderTest() {
+        const container = document.getElementById('testContainer');
+        let html = '';
+        testData.forEach((q, idx) => {
+            html += `<div class="question" data-q="${idx}">`;
+            html += `<p>${q.question}</p>`;
+            html += `<div class="options">`;
+            q.options.forEach((opt, optIdx) => {
+                html += `<div class="option" data-q="${idx}" data-opt="${optIdx}" onclick="selectOption(${idx}, ${optIdx})">${opt}</div>`;
+            });
+            html += `</div>`;
+            html += `</div>`;
+        });
+        container.innerHTML = html;
+        document.getElementById('testResultContainer').style.display = 'none';
+        document.getElementById('goToChecklistBtn').classList.add('hidden');
+        document.getElementById('submitTestBtn').classList.remove('hidden');
+        document.getElementById('submitTestBtn').disabled = false;
+        document.getElementById('submitTestBtn').textContent = 'Завершить тест';
+    }
+
+    function selectOption(qIdx, optIdx) {
+        if (testSubmitted) return;
+        const options = document.querySelectorAll(`.question[data-q="${qIdx}"] .option`);
+        options.forEach(opt => opt.classList.remove('selected'));
+        options[optIdx].classList.add('selected');
+        selectedOptions[qIdx] = optIdx;
+    }
+
+    function submitTest() {
+        if (testSubmitted) return;
+        for (let i = 0; i < testData.length; i++) {
+            if (selectedOptions[i] === undefined) {
+                alert(`Ответьте на вопрос ${i+1}`);
+                return;
+            }
+        }
+
+        let correctCount = 0;
+        const resultHtml = [];
+        testData.forEach((q, idx) => {
+            const selected = selectedOptions[idx];
+            const isCorrect = (selected === q.correct);
+            if (isCorrect) correctCount++;
+            const passClass = isCorrect ? 'pass' : 'fail';
+            const correctAnswer = q.options[q.correct];
+            const userAnswer = q.options[selected];
+            resultHtml.push(`
+                <div class="result-item ${passClass}">
+                    <div class="q-text">${q.question}</div>
+                    <div class="answer">${isCorrect ? '✅ Правильно' : '❌ Неправильно'}</div>
+                    <div class="answer">Ваш ответ: ${userAnswer}</div>
+                    <div class="answer">Правильный ответ: <strong>${correctAnswer}</strong></div>
+                    <div class="explanation"><i class="fas fa-lightbulb" style="color: var(--copper);"></i> ${q.explanation}</div>
+                </div>
+            `);
+        });
+
+        const container = document.getElementById('testResultContainer');
+        container.innerHTML = `<div class="test-result">${resultHtml.join('')}</div>`;
+        container.style.display = 'block';
+
+        const earned = correctCount * 5;
+        addScore(earned);
+
+        testSubmitted = true;
+        testPassed = (correctCount === testData.length);
+        document.getElementById('submitTestBtn').disabled = true;
+        document.getElementById('submitTestBtn').textContent = 'Тест пройден';
+
+        document.getElementById('goToChecklistBtn').classList.remove('hidden');
+    }
+
+    // --- Чек-лист ---
+    function renderChecklist() {
+        const container = document.getElementById('checklistContainer');
+        let html = '';
+        checklistItems.forEach((item, idx) => {
+            html += `<div class="checklist-item">`;
+            html += `<input type="checkbox" id="chk${idx}" onchange="updateChecklist()">`;
+            html += `<label for="chk${idx}">${item}</label>`;
+            html += `</div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function updateChecklist() {}
+
+    function finishCourse() {
+        const checkboxes = document.querySelectorAll('#checklistContainer input[type="checkbox"]');
+        let allChecked = true;
+        checkboxes.forEach(cb => { if (!cb.checked) allChecked = false; });
+        if (!allChecked) {
+            alert('Отметьте все пункты чек-листа, чтобы завершить обучение.');
+            return;
+        }
+        if (!document.getElementById('checklistContainer').dataset.scored) {
+            addScore(10);
+            document.getElementById('checklistContainer').dataset.scored = 'true';
+        }
+        goToStep(7);
+    }
+
+    // --- Сертификат (только для отображения, без кнопок) ---
+    function generateCertificate() {
+        const name = userName || 'Курьер';
+        document.getElementById('certName').textContent = name;
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('certDate').textContent = dateStr;
+        // Рисуем на canvas для возможного использования, но без кнопок скачивания
+        const canvas = document.getElementById('certCanvas');
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width, h = canvas.height;
+        const grad = ctx.createLinearGradient(0, 0, w, h);
+        grad.addColorStop(0, '#faf6f0');
+        grad.addColorStop(1, '#f0e8df');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = '#FF244C';
+        ctx.lineWidth = 12;
+        ctx.strokeRect(20, 20, w-40, h-40);
+        ctx.strokeStyle = '#800000';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(36, 36, w-72, h-72);
+
+        ctx.fillStyle = '#2d1f17';
+        ctx.font = 'bold 40px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('📜 Сертификат', w/2, 80);
+
+        ctx.font = '24px Inter, sans-serif';
+        ctx.fillStyle = '#3f332a';
+        ctx.fillText('об обучении по программе', w/2, 140);
+
+        ctx.font = 'bold 48px Inter, sans-serif';
+        ctx.fillStyle = '#800000';
+        ctx.fillText(name, w/2, 220);
+
+        ctx.font = '22px Inter, sans-serif';
+        ctx.fillStyle = '#3f332a';
+        ctx.fillText('успешно освоил алгоритм передачи заказа', w/2, 290);
+
+        ctx.font = '18px Inter, sans-serif';
+        ctx.fillStyle = '#5a4a3a';
+        ctx.fillText('и подтвердил свои знания тестированием', w/2, 340);
+
+        ctx.font = '16px Inter, sans-serif';
+        ctx.fillStyle = '#8a7a6a';
+        ctx.fillText(`Дата: ${dateStr}  •  Доставка Экспресс`, w/2, 400);
+
+        ctx.font = '16px Inter, sans-serif';
+        ctx.fillStyle = '#3f332a';
+        ctx.fillText('Методолог', 180, 460);
+        ctx.fillText('Курьер-эксперт', w-180, 460);
+        ctx.beginPath();
+        ctx.moveTo(100, 450);
+        ctx.lineTo(260, 450);
+        ctx.strokeStyle = '#800000';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(w-260, 450);
+        ctx.lineTo(w-100, 450);
+        ctx.stroke();
+
+        canvas.dataset.generated = 'true';
+    }
+
+    // Глобальные функции
+    window.nextStep = nextStep;
+    window.prevStep = prevStep;
+    window.selectOption = selectOption;
+    window.submitTest = submitTest;
+    window.updateChecklist = updateChecklist;
+    window.finishCourse = finishCourse;
+    window.goToStep = goToStep;
+
+    init();
+</script>
+</body>
+</html>
