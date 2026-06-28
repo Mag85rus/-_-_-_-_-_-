@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Обучение курьеров — новый флоу</title>
+    <title>Обучение курьеров — новый алгоритм</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Все стили без изменений — они уже корректны */
         * {
             margin: 0;
             padding: 0;
@@ -292,7 +293,6 @@
         .option .feedback.correct { color: #2e7d32; }
         .option .feedback.wrong { color: var(--primary); }
 
-        /* Детальный разбор после теста */
         .test-result {
             margin-top: 16px;
         }
@@ -326,7 +326,6 @@
             border-radius: 8px;
         }
 
-        /* Чек-лист */
         .checklist-item {
             display: flex;
             align-items: center;
@@ -421,7 +420,6 @@
             color: #fff;
         }
 
-        /* Финальный экран с поздравлениями (без кнопок скачать/печать) */
         .final {
             text-align: center;
             padding: 20px 0;
@@ -555,7 +553,7 @@
     <div class="header">
         <div class="brand">
             <div class="brand-icon"><i class="fas fa-route"></i></div>
-            <div class="brand-text">Доставка <span>•</span> Обучение</div>
+            <div class="brand-text">Доставка <span>•</span> Обучение <span>•</span> Качество <span>•</span> Скорость <span>•</span> Забота</div>
         </div>
         <div class="score-area">
             <span class="progress-indicator" id="stepIndicator">1 / 6</span>
@@ -579,7 +577,7 @@
                 <p>В этом обучении ты:</p>
                 <ul>
                     <li><i class="fas fa-check-circle"></i> Узнаешь, зачем мы внедрили механику свайпов</li>
-                    <li><i class="fas fa-check-circle"></i> Изучишь пошаговый алгоритм из 4 шагов</li>
+                    <li><i class="fas fa-check-circle"></i> Изучишь пошаговый алгоритм</li>
                     <li><i class="fas fa-check-circle"></i> Освоишь протокол «3 × 20» для недозвонов</li>
                     <li><i class="fas fa-check-circle"></i> Пройдёшь тест и чек-лист</li>
                 </ul>
@@ -599,7 +597,7 @@
 
         <!-- Шаг 1: Модуль 1 -->
         <div class="step" data-step="1">
-            <h2>1. Зачем мы меняем флоу?</h2>
+            <h2>1. Зачем мы меняем алгоритм?</h2>
             <div class="subtitle">Почему свайп лучше нажатия</div>
             <div class="card-content">
                 <p><strong>Проблема:</strong> Раньше курьеры могли случайно нажать кнопку в кармане или при переноске телефона – заказ завершался раньше времени, гость не получал уведомление о прибытии, возникали споры и лишние звонки в поддержку.</p>
@@ -620,18 +618,18 @@
 
         <!-- Шаг 2: Модуль 2 (4 шага) -->
         <div class="step" data-step="2">
-            <h2>2. Алгоритм «4 шага»</h2>
+            <h2>2. Алгоритм</h2>
             <div class="subtitle">Главное</div>
             <div class="card-content">
                 <p><strong>Шаг 1. Прибытие</strong><br>
-                Как только остановились у дома – <strong>свайп</strong> по кнопке «На месте». После появится зелёный баннер «Прибытие подтверждено». Только после этого выходите.</p>
+                Как только остановились у адреса доставки, не покидая ТС (до выхода из машины) – <strong>свайп</strong> по кнопке «На месте». После появится зелёный баннер «Прибытие подтверждено». Только после этого продолжайте.</p>
                 <p><strong>Шаг 2. Передача заказа</strong><br>
                 • <strong>Оплата наличными/картой курьеру:</strong> свайп по кнопке «Принять оплату».<br>
                 • <strong>Оплата онлайн:</strong> клик по кнопке «Завершить заказ».</p>
-                <p><strong>Шаг 3. Гость не открывает</strong><br>
+                <p><strong>Гость не открывает</strong><br>
                 Позвоните <strong>3 раза</strong> по <strong>20 секунд</strong>. Если не ответил – нажмите красную кнопку «Не дозвонился».</p>
-                <p><strong>Шаг 4. После «Не дозвонился»</strong><br>
-                Не ждите у двери, уходите на другие заказы. Вернуться можно только через «Вернуться к заказам» после подтверждения.</p>
+                <p><strong>После «Не дозвонился»</strong><br>
+                Не ждите у двери, уходите на другие заказы. Вернуться можно только через «Вернуться к заказам» после подтверждения от поддержки.</p>
                 <div class="badge-step"><i class="far fa-clock"></i> Запомните последовательность</div>
             </div>
             <div class="nav-buttons">
@@ -648,7 +646,7 @@
                 <p><strong>Почему 3 звонка и 20 секунд?</strong><br>
                 3 попытки – достаточный минимум, чтобы гость успел услышать и подойти. 20 секунд – стандартное время ожидания, которое не затягивает, но даёт шанс ответить.</p>
                 <ul>
-                    <li><i class="fas fa-phone"></i> Держите телефон у уха, считайте про себя до 20.</li>
+                    <li><i class="fas fa-phone"></i> Совершая звонок, считайте про себя до 20.</li>
                     <li><i class="fas fa-phone"></i> Если сбросили до 20 секунд – звонок не засчитывается, нужно повторить.</li>
                     <li><i class="fas fa-phone"></i> После трёх полных попыток – только тогда кнопка «Не дозвонился».</li>
                 </ul>
@@ -669,7 +667,7 @@
             <div class="card-content">
                 <ul>
                     <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> Нажал «На месте» уже в подъезде или у двери.<br>
-                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Нажимайте сразу у машины – это важно для точного расчёта времени.</li>
+                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Нажимайте сразу не покидая ТС – это важно для точного расчёта времени.</li>
                     <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> Вместо свайпа просто кликнул – статус не установился.<br>
                     <i class="fas fa-check-circle" style="color: #2e7d32;"></i> <strong>Правильно:</strong> Всегда тяните стрелку до конца, пока не увидите зелёный баннер.</li>
                     <li><i class="fas fa-times-circle" style="color: var(--primary);"></i> <strong>Ошибка:</strong> Позвонил 1 раз – сразу «Не дозвонился».<br>
@@ -712,7 +710,7 @@
             </div>
         </div>
 
-        <!-- Шаг 7: Финальный экран с поздравлениями (без скачать/печать) -->
+        <!-- Шаг 7: Финальный экран -->
         <div class="step" data-step="7">
             <div class="final">
                 <div class="big-icon"><i class="fas fa-trophy"></i></div>
@@ -721,7 +719,7 @@
                 <div class="stars">⭐⭐⭐⭐⭐</div>
                 <p style="font-size: 20px; font-weight: 600;">Ваши очки: <span class="score-final" id="finalScore">0</span></p>
 
-                <!-- Сертификат остаётся для красоты, но без кнопок скачать/печать -->
+                <!-- Сертификат -->
                 <div class="certificate" id="certificateArea">
                     <h3>📜 Сертификат об обучении</h3>
                     <p>Настоящим подтверждается, что</p>
@@ -741,17 +739,17 @@
 </div>
 
 <script>
-    // Данные теста с пояснениями
+    // Данные теста с пояснениями (без изменений)
     const testData = [
         {
             question: '1. Когда нужно сделать свайп «На месте»?',
             options: [
                 'После того как поднялся на этаж',
-                'Сразу по прибытии к дому, до выхода из машины',
+                'Сразу по прибытии на адрес доставки, не покидая ТС(до выхода из машины)',
                 'После того как позвонил в домофон'
             ],
             correct: 1,
-            explanation: 'Свайп «На месте» нужно делать сразу у машины, ещё до входа в здание. Это даёт точный расчёт времени доставки и прозрачность для гостя.'
+            explanation: 'Свайп «На месте» нужно делать сразу не покидая ТС (до выхода из машины), ещё до входа в здание. Это даёт точный расчёт времени доставки и прозрачность для гостя.'
         },
         {
             question: '2. Сколько раз нужно позвонить гостю, если он не открывает дверь?',
@@ -773,7 +771,7 @@
                 'Синий баннер «Заказ принят»'
             ],
             correct: 1,
-            explanation: 'После успешного свайпа появляется зелёный баннер «Прибытие подтверждено» — это сигнал, что можно подниматься к гостю.'
+            explanation: 'После успешного свайпа появляется зелёный баннер «Прибытие подтверждено» — это сигнал, что можно идти дальше к гостю.'
         },
         {
             question: '5. Если заказ оплачен онлайн, какой кнопкой завершать?',
@@ -793,13 +791,13 @@
                 'Позвонить ещё раз через 5 минут'
             ],
             correct: 1,
-            explanation: 'После «Не дозвонился» статус финальный, курьер обязан покинуть адрес и взять следующий заказ. Ожидание запрещено.'
+            explanation: 'После «Не дозвонился» статус финальный, курьер обязан покинуть адрес и доставить следующий заказ. Ожидание запрещено.'
         }
     ];
 
     // Состояние
     let currentStep = 0;
-    const totalSteps = 8; // 0-7
+    const totalSteps = 8;
     let score = 0;
     let testSubmitted = false;
     let testPassed = false;
@@ -807,7 +805,7 @@
 
     const checklistItems = [
         'Я знаю, что свайп – это движение слева направо, а не нажатие.',
-        'Я буду нажимать «На месте» сразу у машины, до выхода.',
+        'Я буду нажимать «На месте», не покидая ТС (до выхода из машины).',
         'Я буду ждать зелёный баннер «Прибытие подтверждено».',
         'Я различаю: свайп для оплаты курьеру и клик для онлайн-оплаты.',
         'Я помню правило 3 звонков по 20 секунд.',
@@ -828,15 +826,15 @@
         userNameInput.addEventListener('input', function() {
             userName = this.value.trim();
         });
-        // Скрываем кнопку перехода к чек-листу изначально
         document.getElementById('goToChecklistBtn').classList.add('hidden');
     }
 
     function goToStep(step) {
         if (step < 0 || step >= totalSteps) return;
+        // ★★★ ИСПРАВЛЕНИЕ: за каждый учебный модуль (шаги 1-4) начисляем 15 очков вместо 10 ★★★
         if (step >= 1 && step <= 4 && !steps[step].dataset.visited) {
             steps[step].dataset.visited = 'true';
-            addScore(10);
+            addScore(15);   // <-- было 10, стало 15
         }
         steps.forEach((el, i) => {
             el.classList.toggle('active', i === step);
@@ -1004,14 +1002,13 @@
         goToStep(7);
     }
 
-    // --- Сертификат (только для отображения, без кнопок) ---
+    // --- Сертификат ---
     function generateCertificate() {
         const name = userName || 'Курьер';
         document.getElementById('certName').textContent = name;
         const now = new Date();
         const dateStr = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
         document.getElementById('certDate').textContent = dateStr;
-        // Рисуем на canvas для возможного использования, но без кнопок скачивания
         const canvas = document.getElementById('certCanvas');
         const ctx = canvas.getContext('2d');
         const w = canvas.width, h = canvas.height;
